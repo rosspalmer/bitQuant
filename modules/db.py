@@ -1,4 +1,6 @@
 import auth
+import api
+
 from pandas import DataFrame
 from pandas.io.sql import read_sql 
 from pandas.tseries.tools import to_datetime
@@ -20,21 +22,21 @@ def trade_data(ntable, exchange='', date =''):
 	else:
 		date = datetime.strptime(date, "%m/%d/%y")		
 		timestamp = int(mktime(date.timetuple()))	
-		df = read_sql('SELECT * FROM %s WHERE timestamp >= %s AND exchange = "%s";' % (ntable, timestamp, exchange), eng)
-	df = dateidx(df)
+		df = read_sql('SELECT * FROM %s WHERE timestamp >= %s;' % (ntable, timestamp), eng)
+	df = date_index(df)
 	return df
 
-def add_db(df, table):	
+def add_to_db(df, table):	
 	df = df.to_dict('records')
-	print '--Converted to Dictionary--'	
+	print '--Converted to Dictionary--'		
 	ins = table.insert().prefix_with('IGNORE')	
 	ins.execute(df)	
 	print '--Executed--'
 
-def dateidx(df):
-	dt = df['timestamp']
-	dt = to_datetime(dt, unit='s')
-	df['date'] = dt
+def date_index(df):
+	date = df['timestamp']
+	date = to_datetime(dt, unit='s')
+	df['date'] = date
 	df = df.set_index('date')
 	return df
 
@@ -47,7 +49,12 @@ def import_csv(exchange):
 	df['timestamp'] = df.index
 	df['exchange'] = exchange	
 	print '--CSV Imported--'	
-	add_db(df, table)
+	add_to_db(df, table)
+
+def trades_ping(exchange, limit=50):
+	table = tables('trades')
+	df, ping = api.trades(exchange, limit)
+	add_to_db(df, table)
 
 def tables(typ,create='no'):	
 	if typ == 'trades':
