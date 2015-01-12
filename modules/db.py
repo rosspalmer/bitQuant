@@ -6,23 +6,19 @@ from pandas.io.sql import read_sql
 from pandas.tseries.tools import to_datetime
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy import Table, Column, Integer, String, Float
-from time import mktime
-from datetime import datetime
 
 engine_str = auth.mysql()
 eng = create_engine(engine_str)
 conn = eng.connect()
 meta = MetaData(eng)
 
-def trade_data(ntable, exchange='', date =''):
-	if exchange == '' and date =='':
-		df = read_sql('SELECT * FROM %s;' % (ntable,), eng)	
-	elif date =='':
-		df = read_sql('SELECT * FROM %s WHERE exchange = "%s";' % (ntable,exchange), eng)
+def trade_data(table, exchange='', start =''):
+	if exchange == '' and start =='':
+		df = read_sql('SELECT * FROM %s;' % (table,), eng)	
+	elif start =='':
+		df = read_sql('SELECT * FROM %s WHERE exchange = "%s";' % (table, exchange), eng)
 	else:
-		date = datetime.strptime(date, "%m/%d/%y")		
-		timestamp = int(mktime(date.timetuple()))	
-		df = read_sql('SELECT * FROM %s WHERE timestamp >= %s;' % (ntable, timestamp), eng)
+		df = read_sql('SELECT * FROM %s WHERE timestamp >= %s;' % (table, start), eng)
 	df = date_index(df)
 	return df
 
@@ -35,7 +31,7 @@ def add_to_db(df, table):
 
 def date_index(df):
 	date = df['timestamp']
-	date = to_datetime(dt, unit='s')
+	date = to_datetime(date, unit='s')
 	df['date'] = date
 	df = df.set_index('date')
 	return df

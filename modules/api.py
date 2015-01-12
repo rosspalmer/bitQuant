@@ -3,12 +3,10 @@ import time as tm
 import json
 from pandas.io.json import json_normalize
 
-def pull(request,typ):	
+def pull(request):	
 	ping = tm.time()	
 	response = urlopen(request)
 	data = json.load(response)
-	if typ == "norm":	
-		data = json_normalize(data)
 	ping = round(tm.time() - ping,3)
 	return data, ping
 
@@ -34,21 +32,22 @@ def trades(exchange, limit):
 	if exchange == "okcoinusd":
 		request = "/trades.do?since="+str(limit)
 	request = url + request
-	trades, ping = pull(request,"norm")
-	trades = trades_format(trades,exchange)	
-	return trades, ping
+	df, ping = pull(request)
+	df = json_normalize(df)	
+	df = trades_format(df, exchange)	
+	return df, ping
 	
-def trades_format(trades, exchange):
+def trades_format(df, exchange):
 	if exchange == "bitfinex":
 		pass
 	if exchange == "btcchina":
-		trades.columns = ['amount','timestamp','price','tid','type']
-		trades['exchange'] = 'btcchina'
+		df.columns = ['amount','timestamp','price','tid','type']
+		df['exchange'] = 'btcchina'
 	if exchange == "okcoincny":
 		pass
 	if exchange == "okcoinusd":
 		pass
-	return trades
+	return df
 		
 def ticker(exchange):
 	url = urls(exchange)
@@ -61,6 +60,6 @@ def ticker(exchange):
 	if exchange == "okcoinusd":
 		request = "/ticker.do?ok=1"	
 	request = url + request
-	ticker, ping = pull(request,"smp")
+	ticker, ping = pull(request)
 	return ticker, ping
 
