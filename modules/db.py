@@ -15,7 +15,7 @@ meta = MetaData(eng)
 def trade_data(table, exchange='', start =''):
 	if exchange == '' and start =='':
 		df = read_sql('SELECT * FROM %s;' % (table,), eng)	
-	elif start =='':
+	elif exchange <>'':
 		df = read_sql('SELECT * FROM %s WHERE exchange = "%s";' % (table, exchange), eng)
 	else:
 		df = read_sql('SELECT * FROM %s WHERE timestamp >= %s;' % (table, start), eng)
