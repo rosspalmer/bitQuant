@@ -37,15 +37,15 @@ def time_slice(df, tsmp, period):
 	df = df[df['timestamp'] < (tsmp + period)]	
 	if len(df.index) == 0:
 		slic = DataFrame({'timestamp' : [tsmp], 'price': lprice, 
-										'high': lprice, 'low': lprice,
-										'open': lprice, 'amount': 0.0})		
+				'high': lprice, 'low': lprice,
+				'open': lprice, 'amount': 0.0})		
 	else:			
 		slic = DataFrame({'timestamp' : [tsmp], 
-										'price': round(df['price'].iloc[-1], 3),
-										'high': round(df['price'].max(), 3), 
-										'low': round(df['price'].min(), 3),
-										'open': round(df['price'].iloc[0], 3), 
-										'amount': round(df['amount'].sum(), 4)})		
+				'price': round(df['price'].iloc[-1], 3),
+				'high': round(df['price'].max(), 3), 
+				'low': round(df['price'].min(), 3),
+				'open': round(df['price'].iloc[0], 3), 
+				'amount': round(df['amount'].sum(), 4)})		
 	return df, slic
 
 
