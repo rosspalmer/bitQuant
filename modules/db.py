@@ -51,8 +51,7 @@ def import_csv(exchange):
 	print '--CSV Imported--'	
 	add_to_db(df, table)
 
-def trades_ping(exchange, limit=50):
-	table = tables('trades')
+def trades_ping(exchange, table, limit=50):
 	df, ping = api.trades(exchange, limit)
 	add_to_db(df, table)
 
