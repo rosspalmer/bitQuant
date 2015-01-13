@@ -3,13 +3,15 @@ import time as tm
 import json
 from pandas.io.json import json_normalize
 
-def pull(request):	
+#|Generic API pull request, return JSON data and "ping" time for return of data
+def get(request):	
 	ping = tm.time()	
 	response = urlopen(request)
 	data = json.load(response)
 	ping = round(tm.time() - ping,3)
 	return data, ping
 
+#|Assigns base url string for each BTC exchange 
 def urls(exchange):
 	if exchange == "bitfinex":
 		url = "https://api.bitfinex.com/v1"
@@ -21,6 +23,8 @@ def urls(exchange):
 		url = "https://www.okcoin.com/api/v1"	
 	return url
 
+#|Pulls trade data from BTC exchange API
+#|'limit' is either size limit or "since" value for OKCoin exchanges
 def trades(exchange, limit):
 	url = urls(exchange)
 	if exchange == "bitfinex":
@@ -36,7 +40,9 @@ def trades(exchange, limit):
 	df = json_normalize(df)	
 	df = trades_format(df, exchange)	
 	return df, ping
-	
+
+#|Formats dataframe output of individual API trade data
+#|into standard format
 def trades_format(df, exchange):
 	if exchange == "bitfinex":
 		pass
@@ -48,7 +54,8 @@ def trades_format(df, exchange):
 	if exchange == "okcoinusd":
 		pass
 	return df
-		
+
+#|Pulls ticker data from exchange APIs		
 def ticker(exchange):
 	url = urls(exchange)
 	if exchange == "bitfinex":
