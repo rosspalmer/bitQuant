@@ -8,9 +8,8 @@ class trades(object):
 	
 	def __init__(self):
 		self.df = DataFrame(columns=('tid','price','amount','type', 'exchange',
-																'timestamp','timestamp_ms','dbtable'))
-		self.ts = DataFrame(columns=('timestamp','price','high',
-																 'low','open','amount'))
+					'timestamp','timestamp_ms','dbtable'))
+		self.ts = DataFrame(columns='timestamp','price','high','low','open','amount'))
 
 	def add(self, table, exchange=''):
 		data = db.trade_data(table, exchange=exchange)
