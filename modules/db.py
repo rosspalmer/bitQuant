@@ -1,33 +1,33 @@
 import auth
 import api
+import sql
 
 from pandas import DataFrame
-from pandas.io.sql import read_sql 
+from pandas.io.sql import read_sql_query 
 from pandas.tseries.tools import to_datetime
 from sqlalchemy import create_engine,  MetaData
-from sqlalchemy import Table, Column, Integer, String, Float
 
-engine_str = auth.mysql()
-eng = create_engine(engine_str)
-conn = eng.connect()
-meta = MetaData(eng)
+def dbconnect():	
+	engine_str = auth.mysql()	
+	eng = create_engine(engine_str)	
+	conn = eng.connect()	
+	meta = MetaData(eng)
+	return eng, conn, meta
 
-def trade_data(table, exchange='', start =''):
-	if exchange == '' and start =='':
-		df = read_sql('SELECT * FROM %s;' % (table,), eng)	
-	elif exchange <>'':
-		df = read_sql('SELECT * FROM %s WHERE exchange = "%s";' % (table, exchange), eng)
-	else:
-		df = read_sql('SELECT * FROM %s WHERE timestamp >= %s;' % (table, start), eng)
+def trades_df(table_name, exchange='', start ='', end=''):		
+	eng, conn, meta = dbconnect()	
+	table = sql.tables(meta, table_name)	
+	arg = {'exchange':exchange, 'start':start, 'end':end}	
+	select = sql.sqlselect(table, arg)
+	select = select.statement()		
+	df = read_sql_query(select, eng) 
 	df = date_index(df)
 	return df
 
 def add_to_db(df, table):	
-	df = df.to_dict('records')
-	print '--Converted to Dictionary--'		
+	df = df.to_dict('records')		
 	ins = table.insert().prefix_with('IGNORE')	
 	ins.execute(df)	
-	print '--Executed--'
 
 def date_index(df):
 	date = df['timestamp']
@@ -36,37 +36,19 @@ def date_index(df):
 	df = df.set_index('date')
 	return df
 
-def import_csv(exchange):
-	table = tables('pricehis')	
+def import_bcharttrades(exchange):
+	table = tables('bcharttrades')	
 	df = DataFrame()
 	path = '%s.csv' % exchange
 	df = df.from_csv(path)
 	df.columns = ['price','amount']
 	df['timestamp'] = df.index
 	df['exchange'] = exchange	
-	print '--CSV Imported--'	
 	add_to_db(df, table)
 
-def trades_ping(exchange, table, limit=50):
+def trades_ping(exchange, limit=50):
+	eng, conn, meta = dbconnect()
+	table = sql.tables(meta, 'trades')	
 	df, ping = api.trades(exchange, limit)
 	add_to_db(df, table)
-
-def tables(typ,create='no'):	
-	if typ == 'trades':
-		table = Table('tds', meta, Column('tid', Integer, primary_key=True),
-			Column('price', Float), Column('amount', Float),
-			Column('type', String(4)), Column('timestamp', Integer),
-			Column('exchange', String(20)))
-	if typ == 'oktrades':
-		table = Table('oktrades', meta, Column('tid', Integer, primary_key=True),
-			Column('price', Float), Column('amount', Float),
-			Column('type', String(4)), Column('timestamp', Integer),
-			Column('timestamp_ms', Integer), Column('exchange', String(20)))
-	if typ == 'pricehis':
-		table = Table('pricehis', meta, Column('timestamp', Integer),
-			Column('price', Float), Column('amount', Float),
-			Column('exchange', String(20)))
-	if create == 'yes':
-		meta.create_all(eng)
-	return table
 

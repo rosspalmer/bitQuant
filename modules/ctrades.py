@@ -4,10 +4,6 @@ from time import mktime
 from datetime import datetime
 from pandas import DataFrame
 
-#			start = datetime.strptime(start, "%m/%d/%y")		
-#			start = int(mktime(start.timetuple()))	
-
-
 class trades(object):
 	
 	def __init__(self):
