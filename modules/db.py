@@ -7,6 +7,7 @@ from pandas.io.sql import read_sql_query
 from pandas.tseries.tools import to_datetime
 from sqlalchemy import create_engine,  MetaData
 
+#|Connect to SQL database and create SQLAlchemy engine and MetaData
 def dbconnect():	
 	engine_str = auth.mysql()	
 	eng = create_engine(engine_str)	
@@ -14,6 +15,7 @@ def dbconnect():
 	meta = MetaData(eng)
 	return eng, conn, meta
 
+#|Pull trade data from SQL table and convert to DataFrame
 def trades_df(table_name, exchange='', start ='', end=''):		
 	eng, conn, meta = dbconnect()	
 	table = sql.tables(meta, table_name)	
@@ -24,11 +26,13 @@ def trades_df(table_name, exchange='', start ='', end=''):
 	df = date_index(df)
 	return df
 
+#|Append DataFrame to SQL table via "INSERT OR IGNORE" command
 def add_to_db(df, table):
 	df = df.to_dict('records')		
 	ins = table.insert().prefix_with('IGNORE')	
 	ins.execute(df)	
 
+#|Create datetime index for DataFrame using "timestamp" column
 def date_index(df):
 	date = df['timestamp']
 	date = to_datetime(date, unit='s')
@@ -36,6 +40,8 @@ def date_index(df):
 	df = df.set_index('date')
 	return df
 
+#|Import BitcoinCharts trade history CSV into SQL database
+#|Before running, place CSV in 'modules' folder and rename file to exchange name
 def import_bcharttrades(exchange):
 	eng, conn, meta = dbconnect()	
 	table = sql.tables(meta, 'bcharttrades')	
@@ -47,6 +53,7 @@ def import_bcharttrades(exchange):
 	df['exchange'] = exchange	
 	add_to_db(df, table)
 
+#|"Ping" exchange API for trade data and import into SQL database
 def trades_ping(exchange, limit=50):
 	eng, conn, meta = dbconnect()
 	table = sql.tables(meta, 'trades')	
