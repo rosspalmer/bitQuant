@@ -24,7 +24,7 @@ def trades_df(table_name, exchange='', start ='', end=''):
 	df = date_index(df)
 	return df
 
-def add_to_db(df, table):	
+def add_to_db(df, table):
 	df = df.to_dict('records')		
 	ins = table.insert().prefix_with('IGNORE')	
 	ins.execute(df)	
@@ -37,7 +37,8 @@ def date_index(df):
 	return df
 
 def import_bcharttrades(exchange):
-	table = tables('bcharttrades')	
+	eng, conn, meta = dbconnect()	
+	table = sql.tables(meta, 'bcharttrades')	
 	df = DataFrame()
 	path = '%s.csv' % exchange
 	df = df.from_csv(path)
