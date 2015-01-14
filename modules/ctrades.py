@@ -9,13 +9,15 @@ class trades(object):
 	def __init__(self):
 		self.df = DataFrame(columns=('tid','price','amount','type', 'exchange',
 					'timestamp','timestamp_ms','dbtable'))
-		self.ts = DataFrame(columns='timestamp','price','high','low','open','amount'))
+		self.ts = DataFrame(columns=('timestamp','price','high',
+					'low','open','amount'))
 
-	def add(self, table, exchange=''):
-		data = db.trade_data(table, exchange=exchange)
-		data = db.date_index(data)
-		data['dbtable'] = table
-		self.df = self.df.append(data)
+	def add(self, table_name, exchange='', start='', end=''):
+		df = db.trades_df(table_name, exchange=exchange,
+				start=start, end=end)
+		df = db.date_index(df)
+		df['dbtable'] = table_name
+		self.df = self.df.append(df)
 		self.df = self.df.sort()
 
 	def time_series(self, period):
