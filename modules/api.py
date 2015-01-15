@@ -36,7 +36,7 @@ def trades(exchange, limit):
 	if exchange == "okcoinusd":
 		request = "/trades.do?since="+str(limit)
 	request = url + request
-	df, ping = pull(request)
+	df, ping = get(request)
 	df = json_normalize(df)	
 	df = trades_format(df, exchange)	
 	return df, ping
@@ -67,6 +67,6 @@ def ticker(exchange):
 	if exchange == "okcoinusd":
 		request = "/ticker.do?ok=1"	
 	request = url + request
-	ticker, ping = pull(request)
+	ticker, ping = get(request)
 	return ticker, ping
 
