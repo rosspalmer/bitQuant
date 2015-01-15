@@ -3,7 +3,7 @@ import api
 import sql
 
 from pandas import DataFrame
-from pandas.io.sql import read_sql_query 
+from pandas.io.sql import read_sql_query
 from pandas.tseries.tools import to_datetime
 from sqlalchemy import create_engine,  MetaData
 
