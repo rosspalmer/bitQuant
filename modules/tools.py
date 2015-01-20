@@ -13,6 +13,7 @@ def time_series(df, period):
 	ts = date_index(ts)
 	return ts
 
+
 def time_slice(df, tsmp, period):
 	lprice = df[df['timestamp'] < tsmp].tail(1)['price']
 	df = df[df['timestamp'] >= tsmp]
@@ -47,7 +48,7 @@ def seconds(days=0, hours=0, minutes=0, typ=''):
 	elif typ == 'h':
 		total = 3600
 	elif typ == 'm':
-		total = 50
+		total = 60
 	return total
 
 
