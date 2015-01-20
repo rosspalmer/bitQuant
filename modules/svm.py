@@ -1,7 +1,14 @@
 import db
+
+import numpy as np
 from pandas import Series, DataFrame
 import matplotlib.pyplot as plt
 from sklearn import svm
+
+def create_mach(sample, result, kernel='linear'):
+	mach = svm.SVC(kernel)
+	mach.fit(sample, result)
+	return mach
 
 def binary(df, column_name):
 	df['binary'] = df[column_name].pct_change()
@@ -9,11 +16,10 @@ def binary(df, column_name):
 	df['binary'] = df.apply(binaryfn, axis=1)
 	return df
 
-def binaryfn(row):
-	rng = 0.007
-	if row['binary'] >= rng:
+def binaryfn(row, limit= 0.007):
+	if row['binary'] >= limit:
 		result = 1
-	elif row['binary'] <= -rng:
+	elif row['binary'] <= -limit:
 		result = -1
 	else:
 		result = 0
@@ -48,31 +54,34 @@ def prc_amt_lag(df, plags=1, alags=0):
 	return ts
 
 def zipcol(ts):
-	c1 = ts['price'].values
-	c2 = ts['prc_change'].values
-	c3 = ts['pc_lag1'].values
-	c4 = ts['amount'].values
-	c5 = ts['amt_change'].values
-	return zip(c1, c2, c3, c4, c5)
+	print ts	
+	c1 = ts['price']#.round(4).values
+	c2 = ts['prc_change']#.round(4).values
+	c3 = ts['pc_lag1']#.round(4).values
+	c4 = ts['amount']#.round(4).values
+	c5 = ts['amt_change']#.round(4).values	
+	out = zip(c1, c2, c3, c4, c5)
+	out = np.round(out, decimals=4)
+	return out
 
 def run():
 
-	df = db.price_db('h', 'bitfinex', 'livetrades')
+	df = db.price_db('h', 'bitfinex', 'bcharttrades') #bcharttrades	
 	ts = prc_amt_lag(df)
-	ts = binary(ts, 'price')
+	ts = binary(ts, 'price')				
+	#ts = ts.dropna()
 	ts1, ts2 = split(ts, 0.50)
-	sample = zipcol(ts1)
-	result = ts1['binary'].values
-
-	mach = svm.SVC(kernel='poly')
-	print mach
+	sample = zipcol(ts1)	
+	result = ts1['binary'].values	
+	print result.sum()	
+	mach = svm.SVC(kernel='linear')
 	mach.fit(sample, result)
-
+	print 'machine fit'
 	test = zipcol(ts2)
 	pred = mach.predict(test)
 	pred = Series(pred, index=ts2.index, name='pred')
 	ts2 = ts2.join(pred)
-	print ts2[ts2['pred'] <> 0].drop(['amount','amt_change'], axis=1)
-	print pred.sum()
+	summary = ts2[ts2['pred'] <> 0].drop(['amount','amt_change'], axis=1)	
+	print summary
 
 run()

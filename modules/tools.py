@@ -7,9 +7,12 @@ def time_series(df, period):
 				'low', 'open', 'amount'))	
 	tmin = int(df['timestamp'].min())
 	tmax = int(df['timestamp'].max())
-	for tsmp in range(tmin, tmax, period):
+	msg = range(tmin, tmax, period*500)	
+	for tsmp in range(tmin, tmax, period):		
 		slic = time_slice(df, tsmp, period)		
 		ts = ts.append(slic)
+		if tsmp in msg:
+			print 'updated: ' + str(date_index(slic).index)
 	ts = date_index(ts)
 	return ts
 
