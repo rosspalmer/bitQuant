@@ -6,6 +6,8 @@ from tools import date_index, time_series, seconds
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
+from time import mktime
+from datetime import datetime
 
 #|Connect to SQL database and create SQLAlchemy engine and MetaData
 def dbconnect():	
@@ -28,11 +30,12 @@ def trades_df(table_name, exchange='', start ='', end=''):
 	if end <> '':
 		end = dateconv(end)
 		sel = sel.where(tbl.c.timestamp <= end)
-	print 'select statement crafted'
 	result = conn.execute(sel)
+	headers = result.keys()
 	result = result.fetchall()
-#	df = date_index(df)
-	return result
+	df = DataFrame(result, columns=headers)
+	df = date_index(df)
+	return df
 
 #|Append DataFrame to SQL table via "INSERT OR IGNORE" command
 def add_to_db(df, table):
