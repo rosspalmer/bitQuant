@@ -4,7 +4,6 @@ import sql
 from tools import date_index, time_series, seconds
 
 from pandas import DataFrame
-from pandas import read_sql_query
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
 
@@ -19,13 +18,21 @@ def dbconnect():
 #|Pull trade data from SQL table and convert to DataFrame
 def trades_df(table_name, exchange='', start ='', end=''):		
 	eng, conn, meta = dbconnect()	
-	table = sql.tables(meta, table_name)	
-	arg = {'exchange':exchange, 'start':start, 'end':end}	
-	select = sql.sqlselect(table, arg)
-	select = select.statement()		
-	df = read_sql_query(select, eng) 
-	df = date_index(df)
-	return df
+	tbl = sql.tables(meta, table_name)
+	sel = select([tbl])	
+	if exchange <> '':
+		sel = sel.where(tbl.c.exchange == exchange)
+	if start <> '':
+		start = dateconv(start)
+		sel = sel.where(tbl.c.timestamp >= start)
+	if end <> '':
+		end = dateconv(end)
+		sel = sel.where(tbl.c.timestamp <= end)
+	print 'select statement crafted'
+	result = conn.execute(sel)
+	result = result.fetchall()
+#	df = date_index(df)
+	return result
 
 #|Append DataFrame to SQL table via "INSERT OR IGNORE" command
 def add_to_db(df, table):
@@ -77,4 +84,9 @@ def price_db(typ, exchange, source):
 	df = date_index(df)
 	return df
 
+#|Convert datetime sting (format: mm/dd/yy) to timestamp
+def dateconv(date):
+	date = datetime.strptime(date, "%m/%d/%y")		
+	timestamp = int(mktime(date.timetuple()))	
+	return timestamp
 
