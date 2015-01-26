@@ -1,5 +1,7 @@
 from pandas import DataFrame
 from pandas.tseries.tools import to_datetime
+from time import mktime
+from datetime import datetime
 
 #|Create time series from trade history DataFrame
 def time_series(df, period):
@@ -54,4 +56,9 @@ def seconds(days=0, hours=0, minutes=0, typ=''):
 		total = 60
 	return total
 
+#|Convert datetime sting (format: mm/dd/yy) to timestamp
+def dateconv(date):
+	date = datetime.strptime(date, "%m/%d/%y")		
+	timestamp = int(mktime(date.timetuple()))	
+	return timestamp
 

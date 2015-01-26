@@ -1,13 +1,12 @@
 import auth
 import api
 import sql
-from tools import date_index, time_series, seconds
+import tools
+#from tools import date_index, time_series, seconds, dateconv
 
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
-from time import mktime
-from datetime import datetime
 
 #|Connect to SQL database and create SQLAlchemy engine and MetaData
 def dbconnect():	
@@ -17,79 +16,89 @@ def dbconnect():
 	meta = MetaData(eng)
 	return eng, conn, meta
 
-#|Pull trade data from SQL table and convert to DataFrame
-def trades_df(table_name, exchange='', start ='', end=''):		
-	eng, conn, meta = dbconnect()	
+#|----------------------------------------
+#|-----Generic SQL-DataFrame commands-----
+
+#|Insert DataFrame to SQL table using "INSERT OR IGNORE" command
+def df_to_sql(df, table):
+	df = df.to_dict('records')		
+	ins = table.insert().prefix_with('IGNORE')	
+	ins.execute(df)	
+
+#|Return DataFrame from SQL table using filter arguments
+def sql_to_df(table_name, exchange='', start='',
+		end='', source=''):
+	eng, conn, meta = dbconnect()
 	tbl = sql.tables(meta, table_name)
 	sel = select([tbl])	
+	
 	if exchange <> '':
 		sel = sel.where(tbl.c.exchange == exchange)
 	if start <> '':
-		start = dateconv(start)
+		start = tools.dateconv(start)
 		sel = sel.where(tbl.c.timestamp >= start)
 	if end <> '':
-		end = dateconv(end)
+		end = tools.dateconv(end)
 		sel = sel.where(tbl.c.timestamp <= end)
+	if source <> '':
+		sel = sel.where(tbl.c.source == source)
+	
 	result = conn.execute(sel)
 	headers = result.keys()
 	result = result.fetchall()
 	df = DataFrame(result, columns=headers)
-	df = date_index(df)
+	df = tools.date_index(df)
 	return df
 
-#|Append DataFrame to SQL table via "INSERT OR IGNORE" command
-def add_to_db(df, table):
-	df = df.to_dict('records')		
-	ins = table.insert().prefix_with('IGNORE')	
-	ins.execute(df)	
+#|-----------------------------------------------
+#|-----Trade/Price SQL to DataFrame commands-----
+#| ~~ Used to force required variable inputs ~~
+
+#|Pull trade data from SQL table and convert to DataFrame
+def trades_df(table_name, exchange='', start ='', end=''):		
+	df = sql_to_df(table_name, exchange=exchange,
+			start=start, end=end)
+	return df
+
+#|Return price history DataFrame using exchange/source filters
+#|available "typ" options are 'm'(min), 'h'(hour), or 'd'(day)
+def price_df(typ, exchange, source):
+	table_name = 'pricehistory' + str(typ)
+	df = sql_to_df(table_name, exchange=exchange,
+			source=source)
+	return df
+
+#|---------------------------------------------
+#|-----Source specific SQL import commands-----
+
+#|"Ping" exchange API for trade data and import into SQL database
+def trades_api_ping(exchange, limit=50):
+	eng, conn, meta = dbconnect()
+	tbl = sql.tables(meta, 'trades')	
+	df, ping = api.trades(exchange, limit)
+	df_to_sql(df, tbl)
+
+#|Convert trade history to price and add to SQL database
+def trades_to_pricedb(df, typ, exchange, source):
+	table_name = "pricehistory" + str(typ)
+	eng, conn, meta = dbconnect()
+	tbl = sql.tables(meta, table_name)
+	ts = tools.time_series(df, seconds(typ=typ))
+	ts['exchange'] = exchange
+	ts['source'] = source	
+	df_to_sql(ts, tbl)
 
 #|Import BitcoinCharts trade history CSV into SQL database
 #|Before running, place CSV in 'modules' folder and rename file to exchange name
 def import_bcharttrades(exchange):
 	eng, conn, meta = dbconnect()	
-	table = sql.tables(meta, 'bcharttrades')	
+	tbl = sql.tables(meta, 'bcharttrades')	
 	df = DataFrame()
 	path = '%s.csv' % exchange
 	df = df.from_csv(path)
 	df.columns = ['price','amount']
 	df['timestamp'] = df.index
 	df['exchange'] = exchange	
-	add_to_db(df, table)
+	df_to_sql(df, tbl)
 
-#|"Ping" exchange API for trade data and import into SQL database
-def trades_ping(exchange, limit=50):
-	eng, conn, meta = dbconnect()
-	table = sql.tables(meta, 'trades')	
-	df, ping = api.trades(exchange, limit)
-	add_to_db(df, table)
-
-#|Convert and add trade history to SQL database
-def trades_to_pricedb(df, typ, exchange, source):
-	table_name = "pricehistory" + str(typ)
-	eng, conn, meta = dbconnect()
-	table = sql.tables(meta, table_name)
-	ts = time_series(df, seconds(typ=typ))
-	ts['exchange'] = exchange
-	ts['source'] = source	
-	add_to_db(ts, table)
-
-#|Return price history DataFrame using exchange/source filters
-def price_db(typ, exchange, source):
-	table_name = 'pricehistory' + str(typ)
-	eng, conn, meta = dbconnect()
-	tbl = sql.tables(meta, table_name)
-	sel = select([tbl]).where(tbl.c.exchange == exchange)
-	sel = sel.where(tbl.c.source == source)
-	result = conn.execute(sel)
-	result = result.fetchall()
-	df = DataFrame(result, columns=('timestamp','price','amount','high','low',
-					'open','exchange','source'))
-	df = date_index(df)
-	return df
-
-#|Convert datetime sting (format: mm/dd/yy) to timestamp
-def dateconv(date):
-	date = datetime.strptime(date, "%m/%d/%y")		
-	timestamp = int(mktime(date.timetuple()))	
-	return timestamp
 
