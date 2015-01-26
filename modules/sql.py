@@ -20,7 +20,7 @@ def tables(meta, table_name):
 			Column('exchange', String(20)))
 	if table_name == 'price':
 		tbl = Table(table_name, meta, 
-			Column('date', DateTime, primary_key=True),
+			Column('timestamp', Integer, primary_key=True),
 			Column('price', Float), Column('amount', Float),
 			Column('open', Float), Column('high', Float),
 			Column('low', Float),

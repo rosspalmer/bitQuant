@@ -3,6 +3,7 @@ import api
 import sql
 import tools
 
+import numpy as np
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
@@ -89,9 +90,8 @@ def trades_to_pricedb(trd, freq, source):
 	db = dbconnect()
 	tbl = db.addtbl('price')
 	prc = tools.trades_to_price(trd, freq, source=source)
-	prc['date'] = prc.index.get_values()
+	prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 	prc['freq'] = freq
-	print prc.dtypes	
 	df_to_sql(prc, tbl)
 
 #|Import BitcoinCharts trade history CSV into SQL database

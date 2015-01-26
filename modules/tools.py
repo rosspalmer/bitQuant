@@ -10,15 +10,16 @@ def trades_to_price(trd, freq, source=''):
 	amount = trd['amount']	
 	prc = DataFrame(index=price.resample(freq, how='last').index)	
 	
-	prc['price'] = price.resample(freq, how='last')
-	prc['open'] = price.resample(freq, how='first')
-	prc['high'] = price.resample(freq, how='max')
-	prc['low'] = price.resample(freq, how='min')
+	prc['price'] = price.resample(freq, how='last').fillna(method='ffill')
+	prc['open'] = price.resample(freq, how='first').fillna(value=0)
+	prc['high'] = price.resample(freq, how='max').fillna(value=0)
+	prc['low'] = price.resample(freq, how='min').fillna(value=0)
 	
-	prc['amount'] = amount.resample(freq, how='sum')
+	prc['amount'] = amount.resample(freq, how='sum').fillna(value=0)
 	prc['exchange'] = trd['exchange'].iloc[0]	
 	if source <> '':
 		prc['source'] = source
+	prc = prc[1:-1]
 	return prc
 
 #|Create datetime index for DataFrame using "timestamp" column
@@ -33,10 +34,5 @@ def date_index(df):
 def dateconv(date):	
 	date = datetime.strptime(date, "%m/%d/%y")		
 	timestamp = int(mktime(date.timetuple()))		
-	return timestamp
-
-def dftimestamp(row):
-	print date
-	timestamp = int(mktime(date))
 	return timestamp
 	
