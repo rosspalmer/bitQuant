@@ -2,34 +2,41 @@ import auth
 import api
 import sql
 import tools
-#from tools import date_index, time_series, seconds, dateconv
 
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
+from sqlalchemy.engine.reflection import Inspector
 
 #|Connect to SQL database and create SQLAlchemy engine and MetaData
-def dbconnect():	
-	engine_str = auth.mysql()	
-	eng = create_engine(engine_str)	
-	conn = eng.connect()	
-	meta = MetaData(eng)
-	return eng, conn, meta
+class dbconnect():	
+	
+	def __init__(self):	
+		engine_str = auth.mysql()	
+		self.eng = create_engine(engine_str)	
+		self.conn = self.eng.connect()	
+		self.meta = MetaData(self.eng)
+
+	def addtbl(self, table_name, create='no'):
+		tbl = sql.tables(self.meta, table_name)
+		if create == 'yes':
+			self.meta.create_all(self.eng)
+		return tbl
 
 #|----------------------------------------
 #|-----Generic SQL-DataFrame commands-----
 
 #|Insert DataFrame to SQL table using "INSERT OR IGNORE" command
-def df_to_sql(df, table):
+def df_to_sql(df, tbl):
 	df = df.to_dict('records')		
-	ins = table.insert().prefix_with('IGNORE')	
+	ins = tbl.insert().prefix_with('IGNORE')	
 	ins.execute(df)	
 
 #|Return DataFrame from SQL table using filter arguments
 def sql_to_df(table_name, exchange='', start='',
 		end='', source=''):
-	eng, conn, meta = dbconnect()
-	tbl = sql.tables(meta, table_name)
+	db = dbconnect()
+	tbl = db.addtbl(table_name)
 	sel = select([tbl])	
 	
 	if exchange <> '':
@@ -43,7 +50,7 @@ def sql_to_df(table_name, exchange='', start='',
 	if source <> '':
 		sel = sel.where(tbl.c.source == source)
 	
-	result = conn.execute(sel)
+	result = db.conn.execute(sel)
 	headers = result.keys()
 	result = result.fetchall()
 	df = DataFrame(result, columns=headers)
@@ -51,42 +58,41 @@ def sql_to_df(table_name, exchange='', start='',
 	return df
 
 #|-----------------------------------------------
-#|-----Trade/Price SQL to DataFrame commands-----
+#|-----Trades/Price SQL to DataFrame commands-----
 #| ~~ Used to force required variable inputs ~~
 
-#|Pull trade data from SQL table and convert to DataFrame
+#|Pull trades data from SQL table and convert to DataFrame
 def trades_df(table_name, exchange='', start ='', end=''):		
-	df = sql_to_df(table_name, exchange=exchange,
+	trd = sql_to_df(table_name, exchange=exchange,
 			start=start, end=end)
-	return df
+	return trd
 
 #|Return price history DataFrame using exchange/source filters
-#|available "typ" options are 'm'(min), 'h'(hour), or 'd'(day)
-def price_df(typ, exchange, source):
-	table_name = 'pricehistory' + str(typ)
-	df = sql_to_df(table_name, exchange=exchange,
+def price_df(freq, exchange, source):
+	table_name = 'pricehistory' + str(freq)
+	prc = sql_to_df(table_name, exchange=exchange,
 			source=source)
-	return df
+	return prc
 
 #|---------------------------------------------
 #|-----Source specific SQL import commands-----
 
 #|"Ping" exchange API for trade data and import into SQL database
-def trades_api_ping(exchange, limit=50):
-	eng, conn, meta = dbconnect()
-	tbl = sql.tables(meta, 'trades')	
-	df, ping = api.trades(exchange, limit)
-	df_to_sql(df, tbl)
+def trades_api_ping(exchange, limit=100):
+	db = dbconnect()
+	tbl = db.addtbl('trades')
+	trd, ping = api.trades(exchange, limit)
+	df_to_sql(trd, tbl)
 
 #|Convert trade history to price and add to SQL database
-def trades_to_pricedb(df, typ, exchange, source):
-	table_name = "pricehistory" + str(typ)
-	eng, conn, meta = dbconnect()
-	tbl = sql.tables(meta, table_name)
-	ts = tools.time_series(df, seconds(typ=typ))
-	ts['exchange'] = exchange
-	ts['source'] = source	
-	df_to_sql(ts, tbl)
+def trades_to_pricedb(trd, freq, source):
+	db = dbconnect()
+	tbl = db.addtbl('price')
+	prc = tools.trades_to_price(trd, freq, source=source)
+	prc['date'] = prc.index.get_values()
+	prc['freq'] = freq
+	print prc.dtypes	
+	df_to_sql(prc, tbl)
 
 #|Import BitcoinCharts trade history CSV into SQL database
 #|Before running, place CSV in 'modules' folder and rename file to exchange name
@@ -100,5 +106,4 @@ def import_bcharttrades(exchange):
 	df['timestamp'] = df.index
 	df['exchange'] = exchange	
 	df_to_sql(df, tbl)
-
 
