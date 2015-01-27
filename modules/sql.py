@@ -14,7 +14,7 @@ def tables(meta, table_name):
 			Column('price', Float), Column('amount', Float),
 			Column('type', String(4)), Column('timestamp', Integer),
 			Column('timestamp_ms', Integer), Column('exchange', String(20)))
-	if table_name == 'bcharttrades':
+	if table_name == 'bchtrades':
 		tbl = Table(table_name, meta, Column('timestamp', Integer),
 			Column('price', Float), Column('amount', Float),
 			Column('exchange', String(20)))
