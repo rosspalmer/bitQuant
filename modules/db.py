@@ -86,7 +86,7 @@ def price_df(freq, exchange, source):
 #|"Ping" exchange API for trade data and import into SQL database
 def trades_api_ping(exchange, limit=100):
 	dbc = dbconnect()
-	trd, ping = api.trades(exchange, limit)	
+	trd = api.trades(exchange, limit)	
 	dbc.df_to_sql(trd, 'trades')
 
 #|Convert trade history to price and add to SQL database

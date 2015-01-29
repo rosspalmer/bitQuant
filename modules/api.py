@@ -8,14 +8,13 @@ import json
 from pandas.io.json import json_normalize
 from pandas import DataFrame
 
-#|Generic API pull request, return JSON data and "ping" time for return of data
+#|Generic API GET request and return JSON data
 def get(request):	
-	ping = tm.time()	
 	response = urlopen(request)
 	data = json.load(response)
-	ping = round(tm.time() - ping,3)
-	return data, ping
+	return data
 
+#|Import trade data from bitcoincharts API
 def bchart(exchange, start):
 	url = 'http://api.bitcoincharts.com/v1/trades.csv?symbol=%s&start=' % exchange	
 	start = tools.dateconv(start)
@@ -25,6 +24,15 @@ def bchart(exchange, start):
 	data = list(csvfile)
 	df = DataFrame(data, columns=('timestamp','price','amount')) 
 	return df
+
+#|Import daily price data from Quandl API
+def quandl(exchange):
+	request = 'https://www.quandl.com/api/v1/datasets/BCHARTS/%s.json' % exchange
+	response = get(request)
+	data = response['data']
+	headers = response['column_names']
+	df = DataFrame(data, columns=headers)
+	return df	
 
 #|Assigns base url string for each BTC exchange 
 def urls(exchange):
@@ -51,10 +59,10 @@ def trades(exchange, limit):
 	if exchange == "okcoinusd":
 		request = "/trades.do?since="+str(limit)
 	request = url + request
-	df, ping = get(request)
+	df = get(request)
 	df = json_normalize(df)	
 	df = trades_format(df, exchange)	
-	return df, ping
+	return df
 
 #|Formats dataframe output of individual API trade data
 #|into standard format
@@ -82,6 +90,5 @@ def ticker(exchange):
 	if exchange == "okcoinusd":
 		request = "/ticker.do?ok=1"	
 	request = url + request
-	ticker, ping = get(request)
-	return ticker, ping
-
+	ticker = get(request)
+	return ticker
