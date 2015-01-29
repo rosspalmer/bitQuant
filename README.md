@@ -1,6 +1,6 @@
 # bitQuant
 
-  - Easy tools to add trade data from exchange APIs into SQL servers - (almost)Complete
+  - Easy tools to pull trade data from exchange APIs and store in SQL servers - (almost)Complete
   - Backtesting structure for testing trade scripts agaisnt SQL data - Planning
   - Live trading via exchange APIs and trade scripts - Not yet
 
