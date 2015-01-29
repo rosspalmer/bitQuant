@@ -3,11 +3,12 @@ import api
 import sql
 import tools
 
+import csv
+import codecs
 import numpy as np
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
-from sqlalchemy.engine.reflection import Inspector
 
 #|-------------------------------------------------
 #|-----Connect to SQL data via dbconnect class-----
@@ -66,16 +67,16 @@ class dbconnect():
 
 #|Pull trades data from SQL table and convert to DataFrame
 def trades_df(table_name, exchange='', start ='', end=''):		
-	db = dbconnect()	
-	trd = db.sql_to_df(table_name, exchange=exchange,
+	dbc = dbconnect()	
+	trd = dbc.sql_to_df(table_name, exchange=exchange,
 			start=start, end=end)
 	return trd
 
 #|Return price history DataFrame using exchange/source filters
 def price_df(freq, exchange, source):
-	db = dbconnect()
+	dbc = dbconnect()
 	table_name = 'price'
-	prc = db.sql_to_df(table_name, exchange=exchange,
+	prc = dbc.sql_to_df(table_name, exchange=exchange,
 			source=source)
 	return prc
 
@@ -84,27 +85,22 @@ def price_df(freq, exchange, source):
 
 #|"Ping" exchange API for trade data and import into SQL database
 def trades_api_ping(exchange, limit=100):
-	db = dbconnect()
+	dbc = dbconnect()
 	trd, ping = api.trades(exchange, limit)	
-	db.df_to_sql(trd, 'trades')
+	dbc.df_to_sql(trd, 'trades')
 
 #|Convert trade history to price and add to SQL database
 def trades_to_pricedb(trd, freq, source):
-	db = dbconnect()
+	dbc = dbconnect()
 	prc = tools.trades_to_price(trd, freq, source=source)
 	prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 	prc['freq'] = freq
-	db.df_to_sql(prc, 'price')
+	dbc.df_to_sql(prc, 'price')
 
 #|Import BitcoinCharts trade history CSV into SQL database
 #|Before running, place CSV in 'modules' folder and rename file to exchange name
-def import_bcharttrades(exchange):
-	db = dbconnect()
-	trd = DataFrame()
-	path = '%s.csv' % exchange
-	trd = trd.from_csv(path)
-	trd.columns = ['price','amount']
-	trd['timestamp'] = trd.index
-	trd['exchange'] = exchange	
-	db.df_to_sql(trd, 'bchtrades')
-
+def import_bchart(exchange, start):
+	dbc = dbconnect()
+	trd = api.bchart(exchange, start)
+	trd['exchange'] = exchange
+	dbc.df_to_sql(trd, 'bchtrades')

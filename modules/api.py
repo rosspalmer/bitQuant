@@ -1,7 +1,12 @@
+import tools
+
+import csv
+import codecs as co
 from urllib import urlopen
 import time as tm
 import json
 from pandas.io.json import json_normalize
+from pandas import DataFrame
 
 #|Generic API pull request, return JSON data and "ping" time for return of data
 def get(request):	
@@ -10,6 +15,16 @@ def get(request):
 	data = json.load(response)
 	ping = round(tm.time() - ping,3)
 	return data, ping
+
+def bchart(exchange, start):
+	url = 'http://api.bitcoincharts.com/v1/trades.csv?symbol=%s&start=' % exchange	
+	start = tools.dateconv(start)
+	request = url + str(start)	
+	response = urlopen(request)
+	csvfile = csv.reader(co.iterdecode(response, 'utf-8'))
+	data = list(csvfile)
+	df = DataFrame(data, columns=('timestamp','price','amount')) 
+	return df
 
 #|Assigns base url string for each BTC exchange 
 def urls(exchange):
