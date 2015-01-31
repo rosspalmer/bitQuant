@@ -1,0 +1,15 @@
+class event(object):
+	pass
+
+class market_event(event):
+	def __init__(self):
+		self.type = 'market'
+
+class signal_event(event):
+	def __init__(self, symbol, datetime, signal_type):
+		self.type = 'signal'
+		self.symbol = symbol
+		self.datetime = datetime
+		self.signal_type = signal_type
+
+
