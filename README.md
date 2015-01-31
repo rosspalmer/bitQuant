@@ -12,12 +12,17 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
 - Store data on MySQL server
 - Convert trade data into price history for any period
 - Retrieve MySQL data as easy to use pandas DataFrames
-- Quandl API support (end of day price history)
+- Quandl API support for EOD data
 
-**Planned Features**
+**Short Term Goals**
+- Pull individual api commands from csv for api module
+- Folder structure
+- Install via PyPi setup
 - Server scripts for automatic exchange pings and data maintence
 - Complete wiki on all modules
-- Backtesting strategies MySQL data utilizing bt (https://github.com/pmorissette/bt)
+
+**Long Term Goals**
+- Event driven backtesting strategies using MySQL data
 - Indicators built for use with pandas
 - Machine learning tools
 - Live algorithmic trading setup
