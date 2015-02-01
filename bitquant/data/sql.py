@@ -27,15 +27,4 @@ def tables(meta, table_name):
 			Column('freq', String(5), primary_key=True), 
 			Column('exchange', String(20), primary_key=True),
 			Column('source', String(3), primary_key=True))
-	if table_name == 'last':
-		tbl = Table(table_name, meta,
-			Column('table', String(20), primary_key=True),
-			Column('exchange', String(20), primary_keys=True),
-			Column('column', String(20), primary_keys=True),
-			Column('value', Float), Column('value2',Float))
 	return tbl
-
-
-
-
-
