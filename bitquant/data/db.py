@@ -34,26 +34,30 @@ class dbconnect():
 	def df_to_sql(self, df, table_name):
 		tbl = self.addtbl(table_name)		
 		df = df.to_dict('records')		
-		ins = tbl.insert().prefix_with('IGNORE')	
+		ins = tbl.insert().prefix_with('IGNORE')
 		ins.execute(df)	
 
 	#|Return DataFrame from SQL table using filter arguments
-	def sql_to_df(self, table_name, exchange='',
-			start='', end='', source=''):
+	def sql_to_df(self, table_name, exchange='', start='',
+			end='', source='', freq=''):
 		tbl = self.addtbl(table_name)
 		sel = select([tbl])	
 	
 		if exchange <> '':
 			sel = sel.where(tbl.c.exchange == exchange)
 		if start <> '':
-			start = tools.dateconv(start)
+			if isinstance(start, str):			
+				start = tools.dateconv(start)
 			sel = sel.where(tbl.c.timestamp >= start)
 		if end <> '':
-			end = tools.dateconv(end)
+			if isinstance(end, str):
+				end = tools.dateconv(end)
 			sel = sel.where(tbl.c.timestamp <= end)
 		if source <> '':
 			sel = sel.where(tbl.c.source == source)
-	
+		if freq <> '':
+			sel = sel.where(tbl.c.freq == freq)
+
 		result = self.conn.execute(sel)
 		headers = result.keys()
 		result = result.fetchall()
@@ -73,21 +77,21 @@ def trades_df(table_name, exchange='', start ='', end=''):
 	return trd
 
 #|Return price history DataFrame using exchange/source filters
-def price_df(freq, exchange, source):
+def price_df(freq='', exchange='', source=''):
 	dbc = dbconnect()
 	table_name = 'price'
 	prc = dbc.sql_to_df(table_name, exchange=exchange,
-			source=source)
+			source=source, freq=freq)
 	return prc
 
 #|---------------------------------------------
 #|-----Source specific SQL import commands-----
 
 #|"Ping" exchange API for trade data and import into SQL database
-def trades_api_ping(exchange, limit=100):
+def api_ping(exchange, limit=100):
 	dbc = dbconnect()
 	trd = api.trades(exchange, limit)	
-	dbc.df_to_sql(trd, 'trades')
+	dbc.df_to_sql(trd, 'api')
 
 #|Convert trade history to price and add to SQL database
 def trades_to_pricedb(trd, freq, source):
