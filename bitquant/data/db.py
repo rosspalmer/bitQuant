@@ -65,25 +65,6 @@ class dbconnect():
 		df = tools.date_index(df)
 		return df
 
-#|-----------------------------------------------
-#|-----Trades/Price SQL to DataFrame commands-----
-#| ~~ Used to force required variable inputs ~~
-
-#|Pull trades data from SQL table and convert to DataFrame
-def trades_df(table_name, exchange='', start ='', end=''):		
-	dbc = dbconnect()	
-	trd = dbc.sql_to_df(table_name, exchange=exchange,
-			start=start, end=end)
-	return trd
-
-#|Return price history DataFrame using exchange/source filters
-def price_df(freq='', exchange='', source=''):
-	dbc = dbconnect()
-	table_name = 'price'
-	prc = dbc.sql_to_df(table_name, exchange=exchange,
-			source=source, freq=freq)
-	return prc
-
 #|---------------------------------------------
 #|-----Source specific SQL import commands-----
 
