@@ -1,6 +1,5 @@
 import auth
 import api
-import sql
 import tools
 
 import csv
@@ -66,6 +65,26 @@ class dbconnect():
 		df = tools.date_index(df)
 		return df
 
+
+#|------------------------------------------------------
+#|--------Trades/Price SQL to DataFrame commands--------
+
+#|Pull trades data from SQL table and convert to DataFrame
+def trades_df(table_name, exchange='', start ='', end=''):		
+	dbc = dbconnect()	
+	trd = dbc.sql_to_df(table_name, exchange=exchange,
+			start=start, end=end)
+	return trd
+
+#|Return price history DataFrame using exchange/source filters
+def price_df(exchange='', freq='', source=''):
+	dbc = dbconnect()
+	table_name = 'price'
+	prc = dbc.sql_to_df(table_name, exchange=exchange,
+			source=source, freq=freq)
+	return prc
+
+
 #|------------------------------------------------------
 #|----------Source specific SQL import commands---------
 
@@ -91,6 +110,7 @@ def import_bchart(exchange, start):
 	trd['exchange'] = exchange
 	dbc.df_to_sql(trd, 'bchtrades')
 
+
 #|-------------------------------------------------
 #|--------------SQLAlchemy Tables------------------
 
@@ -98,7 +118,7 @@ def import_bchart(exchange, start):
 #|SQL table in database
 def tables(meta, table_name):	
 	if table_name == 'api':
-		tbl = Table('tds', meta, Column('tid', Integer, primary_key=True),
+		tbl = Table('api', meta, Column('tid', Integer, primary_key=True),
 			Column('price', Float), Column('amount', Float),
 			Column('type', String(4)), Column('timestamp', Integer),
 			Column('exchange', String(20)))
