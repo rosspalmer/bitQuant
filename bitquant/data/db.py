@@ -9,9 +9,10 @@ import numpy as np
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
+from sqlalchemy import Table, Column, Integer, String, Float, DateTime
 
-#|-------------------------------------------------
-#|-----Connect to SQL data via dbconnect class-----
+#|------------------------------------------------------
+#|--------Connect to SQL data via dbconnect class-------
 
 #|Connect to SQL database and create SQLAlchemy engine and MetaData
 class dbconnect():	
@@ -25,7 +26,7 @@ class dbconnect():
 
 	#|Load table variable and add to metadata
 	def addtbl(self, table_name, create='no'):
-		tbl = sql.tables(self.meta, table_name)
+		tbl = tables(self.meta, table_name)
 		if create == 'yes':
 			self.meta.create_all(self.eng)
 		return tbl
@@ -65,8 +66,8 @@ class dbconnect():
 		df = tools.date_index(df)
 		return df
 
-#|---------------------------------------------
-#|-----Source specific SQL import commands-----
+#|------------------------------------------------------
+#|----------Source specific SQL import commands---------
 
 #|"Ping" exchange API for trade data and import into SQL database
 def api_ping(exchange, limit=100):
@@ -89,3 +90,34 @@ def import_bchart(exchange, start):
 	trd = api.bchart(exchange, start)
 	trd['exchange'] = exchange
 	dbc.df_to_sql(trd, 'bchtrades')
+
+#|-------------------------------------------------
+#|--------------SQLAlchemy Tables------------------
+
+#|Load SQLAlchemy table into MetaData with option to 'create'
+#|SQL table in database
+def tables(meta, table_name):	
+	if table_name == 'api':
+		tbl = Table('tds', meta, Column('tid', Integer, primary_key=True),
+			Column('price', Float), Column('amount', Float),
+			Column('type', String(4)), Column('timestamp', Integer),
+			Column('exchange', String(20)))
+	if table_name == 'okcoin':
+		tbl = Table(table_name, meta, Column('tid', Integer, primary_key=True),
+			Column('price', Float), Column('amount', Float),
+			Column('type', String(4)), Column('timestamp', Integer),
+			Column('timestamp_ms', Integer), Column('exchange', String(20)))
+	if table_name == 'bchart':
+		tbl = Table(table_name, meta, Column('timestamp', Integer),
+			Column('price', Float), Column('amount', Float),
+			Column('exchange', String(20)))
+	if table_name == 'price':
+		tbl = Table(table_name, meta, 
+			Column('timestamp', Integer, primary_key=True),
+			Column('price', Float), Column('amount', Float),
+			Column('open', Float), Column('high', Float),
+			Column('low', Float),
+			Column('freq', String(5), primary_key=True), 
+			Column('exchange', String(20), primary_key=True),
+			Column('source', String(3), primary_key=True))
+	return tbl
