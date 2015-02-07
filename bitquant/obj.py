@@ -1,4 +1,4 @@
-import db
+import sql
 
 import pandas as pd
 import numpy as np
@@ -11,7 +11,7 @@ class price_object(object):
 	#|Initiate object and pull in price data from SQL
 	def __init__(self, exchange='', freq='',
 			source='',columns=[]):
-		self.df = db.price_df(exchange, freq, source)
+		self.df = sql.price_df(exchange, freq, source)
 		if len(columns) > 0:
 			drp = []
 			for x in self.df.columns:
