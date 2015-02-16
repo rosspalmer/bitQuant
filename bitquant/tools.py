@@ -4,7 +4,7 @@ from time import mktime
 from datetime import datetime
 
 #|Convert trades DF to price DF
-def trades_to_price(trd, freq, source=''):
+def trades_to_price(trd, freq):
 	
 	price = trd['price']	
 	amount = trd['amount']	
@@ -16,9 +16,7 @@ def trades_to_price(trd, freq, source=''):
 	prc['low'] = price.resample(freq, how='min').fillna(value=0)
 	
 	prc['amount'] = amount.resample(freq, how='sum').fillna(value=0)
-	prc['exchange'] = trd['exchange'].iloc[0]	
-	if source <> '':
-		prc['source'] = source
+	prc['exchange'] = trd['exchange'].iloc[0]
 	prc = prc[1:-1]
 	return prc
 
@@ -36,3 +34,16 @@ def dateconv(date):
 	timestamp = int(mktime(date.timetuple()))		
 	return timestamp
 	
+def standard_columns(df):
+	cols = []	
+	headers = {'tid':'tid',
+		'price':'price',
+		'amount':'amount',
+		'type':'type',		
+		'timestamp':'timestamp','date':'timestamp',
+		'timestamp_ms':'timestamp_ms',
+		'exchange':'exchange'}
+	for col in df:
+		cols.append(headers[col])
+	df.columns = cols
+	return df
