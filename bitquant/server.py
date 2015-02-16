@@ -1,57 +1,64 @@
+import api
 import sql
 
 import pandas as pd
 import time as tm
 
-#|Update price data using recent API trade data
-def ttop_update(exchange='',freq=''):
-	prc = sql.price_df(freq=freq, exchange=exchange, source='api')
-	last = last_timestamp(prc)
-	trd = sql.trades_df('api', exchange=exchange, start=last)
-	for exchange in prc['exchange'].unique():
-		for freq in prc['freq'].unique():
-			trd = trd[trd['exchange'] == exchange]
-			print trd
-			sql.trades_to_pricedb(trd, freq, 'api')
-			
-#|Determine second to last timestamp for all exchange-freq combinations		
-def last_timestamp(prc):
-	last = []
-	for exchange in prc['exchange'].unique():
-		eprc = prc[prc['exchange'] == exchange]		
-		for freq in prc['freq'].unique():
-			fprc = eprc[eprc['freq'] == freq]		
-			tlast = [fprc['timestamp'].iloc[-2]]
-			last = last + tlast
-	last = int(min(last))
-	return last
+class cron(object):
+	
+	def __init__(self):
+		self.schedule = pd.DataFrame(columns=('exchange','symbol','job'
+					'parameter','start','next','factor'))
+		self.job = {}
 
-#|Function used for cron job scripts	 
-def cron_run(interval=3600, rate=30):
-	start = tm.time()	
-	exchanges = ['bitfinex','btcchina']
-	last = tm.time()-rate
-	while int(tm.time()-start) < interval:
-		if int(tm.time()-last) > rate-1:
-			last = tm.time()			
-			for exchange in exchanges:
-				api_ping(exchange, limit=500)			
-			if tm.time()-last < rate-3:
-				tm.sleep(int(rate-(tm.time() - last)-3))
+	def add_job(self, exchange, symbol, job, limit, freq='',factor=1.0):
+		self.job = {'exchange':exchange, 'symbol':symbol, 
+			'job':job, 'next':0, 'factor':factor}
+		if job == 'price':
+			self.job['start'] = 0
+		self.schedule = self.schedule.append(self.job, ignore_index=True)
 
-#|"Ping" exchange API for trade data and import into SQL database
-def api_ping(exchange, limit=100):
-	db = sql.dbconnect()
-	trd = api.trades(exchange, limit)	
-	db.df_to_sql(trd, 'api')
-	
-#|Convert trade history to price and add to SQL database
-def trades_to_pricedb(trd, freq, source):
-	db = sql.dbconnect()
-	prc = tools.trades_to_price(trd, freq, source=source)
-	prc['timestamp'] = prc.index.astype(np.int64) // 10**9
-	prc['freq'] = freq
-	db.df_to_sql(prc, 'price')
-	
-		
-	
+	def next_job(self):
+		self.schedule = self.schedule.sort('next')
+		self.job = self.schedule.iloc[0].to_dict()	
+
+	def schedule_trades(self, trd):
+		span = int(trd.iloc[0]['timestamp']) - int(trd.iloc[19]['timestamp'])
+		vel = int(span/20)
+		add = round(vel*self.job['parameter']/self.job['factor'],1)
+		self.job['next'] = int(trd.iloc[0]['timestamp']) + add
+
+	def schedule_price(self, prc):
+		period = abs(prc['timestamp'].iloc[1]-prc['timestamp'].iloc[0])
+		self.job['next'] = int(prc['timestamp'].iloc[-1] + period*self.job['factor'])
+		self.job['start'] = int(prc['timestamp'].iloc[-2])
+
+	def sleep(self):
+		self.next_job()
+		next = self.job['next']
+		hold = int(next - tm.time())
+		if hold >= 5:
+			tm.sleep(hold)
+
+	def update(self):
+		self.next_job()
+		if self.job['job'] == 'trades':
+			self.update_trades()
+		elif self.job['job'] == 'price':
+			self.update_price()
+		self.schedule = self.schedule[1:]
+		self.schedule = self.schedule.append(self.job, ignore_index=True)
+
+	def update_trades(self):
+		ping = api.trades_api(self.job['exchange'], self.job['symbol'], 
+				limit=self.job['parameter'])
+		trd = ping.to_sql()
+		self.schedule_trades(trd)
+
+	def update_price(self):
+		top = sql.trades_to_price(self.job['exchange'], self.job['symbol'],
+				self.job['freq'], self.job['start'])
+		prc = top.run()
+		self.schedule_price(prc)
+
+

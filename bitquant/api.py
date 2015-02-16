@@ -38,6 +38,7 @@ class trades_api(object):
 	def to_sql(self):
 		df = self.get_data()
 		sql.df_to_sql(df, 'trades')
+		return df
 
 	#|Construct statement for API trade history data request
 	def trades_statement(self):
@@ -79,3 +80,4 @@ def quandl(sym, add_sql='no'):
 	headers = response['column_names']
 	df = DataFrame(data, columns=headers)
 	return df
+
