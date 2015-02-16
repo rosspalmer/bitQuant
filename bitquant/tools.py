@@ -4,19 +4,20 @@ from time import mktime
 from datetime import datetime
 
 #|Convert trades DF to price DF
-def trades_to_price(trd, freq):
+def olhcv(trd, freq):
 	
 	price = trd['price']	
 	amount = trd['amount']	
 	prc = DataFrame(index=price.resample(freq, how='last').index)	
 	
-	prc['price'] = price.resample(freq, how='last').fillna(method='ffill')
 	prc['open'] = price.resample(freq, how='first').fillna(value=0)
-	prc['high'] = price.resample(freq, how='max').fillna(value=0)
 	prc['low'] = price.resample(freq, how='min').fillna(value=0)
+	prc['high'] = price.resample(freq, how='max').fillna(value=0)
+	prc['close'] = price.resample(freq, how='last').fillna(method='ffill')
+	prc['volume'] = amount.resample(freq, how='sum').fillna(value=0)
 	
-	prc['amount'] = amount.resample(freq, how='sum').fillna(value=0)
 	prc['exchange'] = trd['exchange'].iloc[0]
+	prc['symbol'] = trd['symbol'].iloc[0]
 	prc = prc[1:-1]
 	return prc
 
@@ -33,7 +34,9 @@ def dateconv(date):
 	date = datetime.strptime(date, "%m/%d/%y")		
 	timestamp = int(mktime(date.timetuple()))		
 	return timestamp
-	
+
+#|Convert column names in DataFrame to 'standard'
+#|column names and return DataFrame	
 def standard_columns(df):
 	cols = []	
 	headers = {'tid':'tid',

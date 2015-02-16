@@ -84,15 +84,15 @@ class dbconnect():
 				Column('exchange', String(20), primary_key=True),
 				Column('symbol', String(6), primary_key=True))
 		if table_name == 'price':
-			tbl = Table(table_name, self.meta, 
+			tbl = Table(table_name, self.meta,
 				Column('timestamp', Integer, primary_key=True),
-				Column('price', Float), Column('amount', Float),
-				Column('open', Float), Column('high', Float),
-				Column('low', Float),
-				Column('freq', String(5), primary_key=True), 
 				Column('exchange', String(20), primary_key=True),
 				Column('symbol', String(6), primary_key=True),
-				Column('source', String(3), primary_key=True))
+				Column('freq', String(5), primary_key=True),
+				Column('open', Float), Column('low', Float),
+				Column('high', Float), Column('close', Float),
+				Column('volume', Float),
+				Column('source', String(10), primary_key=True))
 		if table_name == 'exchanges':
 			tbl = Table(table_name, self.meta,
 				Column('exchange', String(20), primary_key=True),
@@ -109,32 +109,53 @@ class dbconnect():
 				Column('last', Integer))
 		return tbl
 
-
+#|Used to convert trade history in MySQL database to price (OLHCV) data
 class trades_to_price(object):
 	
 	def __init__(self):
 		self.keys = DataFrame(columns=('exchange','symbol','freq'))
-		self.db = dbconnect()
 
+	#|Add exchange, symbol, freq to keys list
 	def add_key(self, exchange, symbol, freq):
-		self.keys = self.keys.append([exchange, symbol, freq])
+		key = {'exchange':exchange, 'symbol':symbol,
+			'freq':freq}
+		self.keys = self.keys.append(key, ignore_index=True)
 
-	def run_keys(self):		
-		last = sql.last_df()
-		last = last.join(self.keys).dropna()
-		start = last['last'].min()
-		df = self.db.sql_to_df('trades',start=start)
-		#for exchange in self.keys['exchange'].unique():
-		#	trades_to_price(trd, exchange
+	#|Pull trade data from SQL database, convert trades to price for
+	#|all exchange, symbol, and key combination in keys, and add to
+	#|SQL price table
+	def run(self):	
+		trd = self.get_trades()
+		prc = DataFrame(columns=('price','open','high','low','amount','exchange',
+					'timestamp','freq','symbol','source')) 
+		for i in range(len(self.keys)):
+			key = self.keys.iloc[i]
+			data = self.convert(trd, key['exchange'], 
+				key['symbol'], key['freq'])
+			prc = prc.append(data)
+		df_to_sql(prc, 'price')
 
-	def convert(trd, freq, exchange=''):
-		if exchange <> '':
-			trd = trd[trd['exchange'] == exchange] 
-		prc = tools.trades_to_price(trd, freq)
+	#|Get trade data from SQL database	
+	def get_trades(self):
+		start = self.last_timestamp()
+		trd = trades_df(start=start)
+		return trd
+
+	#|Pull earliest timestamp from 'last' SQL table
+	def last_timestamp(self):
+		last = last_df()
+		timestamp = int(last['last'].min())
+		return timestamp
+
+	#|Convert trade data to price data
+	def convert(self, trd, exchange, symbol, freq):
+		trd = trd[trd['exchange'] == exchange]
+		trd = trd[trd['symbol'] == symbol]
+		prc = tools.olhcv(trd, freq)
 		prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 		prc['freq'] = freq
 		prc['source'] = 'trades'
-		self.db.df_to_sql(prc, 'price')		
+		return prc
 		
 #|------------------------------------------------------
 #|--------Shortcut SQL to DataFrame commands--------
@@ -161,7 +182,7 @@ def price_df(exchange='', freq='', source=''):
 #|Return last timestamp table
 def last_df():
 	db = dbconnect()
-	df = db.sql_to_df('exchanges')
+	df = db.sql_to_df('last')
 	return df
 
 #|Return exchange information table
