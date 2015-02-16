@@ -34,6 +34,11 @@ class trades_api(object):
 		df = self.format_data(df)
 		return df
 
+	#|Insert trades data into
+	def to_sql(self):
+		df = self.get_data()
+		sql.df_to_sql(df, 'trades')
+
 	#|Construct statement for API trade history data request
 	def trades_statement(self):
 		request = self.exc['url']
@@ -67,7 +72,7 @@ def add_parameter(exc, request, parameter, value=''):
 	
 
 #|Import daily price data from Quandl API
-def quandl(sym):
+def quandl(sym, add_sql='no'):
 	request = 'https://www.quandl.com/api/v1/datasets/%s.json' % sym
 	response = get(request)
 	data = response['data']

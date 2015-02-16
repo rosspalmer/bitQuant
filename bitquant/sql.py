@@ -139,6 +139,11 @@ class trades_to_price(object):
 #|------------------------------------------------------
 #|--------Shortcut SQL to DataFrame commands--------
 
+#|Add Dataframe into SQL database
+def df_to_sql(df, table_name):
+	db = dbconnect()
+	db.df_to_sql(df, table_name)
+
 #|Pull trades data from SQL table and convert to DataFrame
 def trades_df(exchange='', start ='', end=''):		
 	db = dbconnect()	
