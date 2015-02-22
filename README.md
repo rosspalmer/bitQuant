@@ -61,6 +61,10 @@ Convert trade history to OLHCV price history, insert data, and return DataFrame
     >> top = bq.trades_to_price(exchange, symbol, freq, start)
     >> price_history = top.to_sql()
 
+Upload trade history csv from [BitcoinCharts](http://api.bitcoincharts.com/v1/csv/) and return price history
+
+    >> price_history = bq.bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
+
 ###Pull Data from MySQL/Quandl as pandas DataFrame
 
 Pull trade history data from MySQL database
@@ -135,3 +139,6 @@ Run cron class, `length` should be the number of seconds for the cron job interv
 
 **`since`: pull API data starting from `since` trade id(tid)**
 - Input integer
+
+**`to_sql`: insert returned data into MySQL database**
+- 'no' (default) or 'yes'
