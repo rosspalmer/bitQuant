@@ -104,12 +104,6 @@ class dbconnect():
 				Column('limit', String(20)), Column('since', String(20)),
 				Column('market', String(20)),Column('quandl', String(50)), 
 				Column('bchart', String(20)),Column('last_touch', Integer))
-		if table_name == 'last':
-			tbl = Table(table_name, self.meta,
-				Column('exchange', String(20), primary_key=True),
-				Column('symbol', String(6), primary_key=True),
-				Column('freq', String(5), primary_key=True),
-				Column('last', Integer))
 		return tbl
 
 #|-----------------------------------------------
@@ -173,20 +167,9 @@ def price_df(exchange='', freq='', source=''):
 			source=source, freq=freq)
 	return df
 
-#|Return last timestamp table
-def last_df(exchange='',symbol='',freq=''):
-	db = dbconnect()
-	df = db.sql_to_df('last',exchange=exchange)
-	return df
-
 #|Return exchange information table
 def exchanges_df(exchange='', symbol=''):
 	db = dbconnect()
 	df = db.sql_to_df('exchanges',
 		exchange=exchange, symbol=symbol)
 	return df
-
-top = trades_to_price('bitfinex','btcusd','h',0)
-prc = top.run()
-#prc = bchart_csv('bitfinex','btcusd','h','bitfinexUSD', to_sql='yes')
-print prc

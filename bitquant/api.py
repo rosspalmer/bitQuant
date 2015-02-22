@@ -1,10 +1,9 @@
 import tools
 import sql
 
-import csv
-import codecs as co
+#import csv
+#import codecs as co
 from urllib import urlopen
-import time as tm
 import json
 from pandas.io.json import json_normalize
 from pandas import DataFrame
