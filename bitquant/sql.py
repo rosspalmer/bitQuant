@@ -135,9 +135,7 @@ class trades_to_price(object):
 	def convert(self):
 		trd = trades_df(exchange=self.exchange,
 				symbol=self.symbol, start=self.start)
-		prc = tools.olhcv(trd, self.freq)
-		prc['timestamp'] = prc.index.astype(np.int64) // 10**9
-		prc['freq'] = self.freq
+		prc = tools.olhcv(trd, self.freq, tsmp_col='yes')
 		prc['source'] = 'trades'
 		return prc
 
@@ -147,12 +145,8 @@ def bchart_csv(exchange, symbol, freq, file_name, to_sql='no'):
 	trd = DataFrame.from_csv(file_path, header=None, index_col=None)
 	trd.columns = ['timestamp','price','amount']
 	trd = tools.date_index(trd)
-	trd['exchange'] = exchange
-	trd['symbol'] = symbol
-	prc = tools.olhcv(trd, freq)
-	prc['freq'] = freq
+	prc = tools.olhcv(trd, freq, exchange, symbol, 'yes')
 	prc['source'] = 'bchart'
-	prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 	if to_sql == 'yes':
 		df_to_sql(prc, 'price')
 	return prc
@@ -192,5 +186,7 @@ def exchanges_df(exchange='', symbol=''):
 		exchange=exchange, symbol=symbol)
 	return df
 
-prc = bchart_csv('bitfinex','btcusd','h','bitfinexUSD', to_sql='yes')
+top = trades_to_price('bitfinex','btcusd','h',0)
+prc = top.run()
+#prc = bchart_csv('bitfinex','btcusd','h','bitfinexUSD', to_sql='yes')
 print prc
