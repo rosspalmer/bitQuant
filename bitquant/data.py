@@ -2,6 +2,8 @@ import api
 import sql
 import tools
 
+from pandas import DataFrame
+
 #|Used to convert trade history in MySQL database to price (OLHCV) data
 class trades_to_price(object):
 	
@@ -27,8 +29,7 @@ class trades_to_price(object):
 		return prc
 
 #|Convert bitcoin charts trade csv to price history
-def bchart_csv(exchange, symbol, freq, file_name, to_sql='no'):
-	file_path = 'csv/%s.csv' % file_name
+def bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
 	trd = DataFrame.from_csv(file_path, header=None, index_col=None)
 	trd.columns = ['timestamp','price','amount']
 	trd = tools.date_index(trd)
@@ -49,6 +50,14 @@ class since_history(object):
 			start = tools.dateconv(start)
 		self.trd = self.build_trd(limit, start)
 
+	#|Convert trade history into price history and insert into SQL if required
+	def prc(self, freq, to_sql='no'):
+		prc = tools.olhcv(self.trd, freq, tsmp_col='yes')
+		prc['source'] = 'trades'
+		if to_sql == 'yes':
+			sql.df_to_sql(prc, 'price')
+		return prc
+
 	#|Build trade history by advancing backwards on 'since' value
 	def build_trd(self, limit, start):
 		trd, size = self.api_ping()
@@ -57,19 +66,10 @@ class since_history(object):
 			add, size = self.api_ping(since=since)
 			trd = trd.append(add)
 			since = int(trd.index.min()) - size
-			print start			
-			print int(trd['timestamp'].min())
+			print trd
 		trd['timestamp'] = trd['timestamp'].astype(int)
 		trd = tools.date_index(trd)	
 		return trd
-
-	#|Convert trade history into price history and insert into SQL if required
-	def prc(self, freq, to_sql='no'):
-		prc = tools.olhcv(self.trd, freq, tsmp_col='yes')
-		prc['source'] = 'trades'
-		if to_sql == 'yes':
-			sql.df_to_sql(prc, 'price')
-		return prc
 
 	#|Ping exchange api and get trades dataframe
 	def api_ping(self, since=''):
@@ -79,5 +79,4 @@ class since_history(object):
 		trd = trd.set_index('tid')
 		size = len(trd.index)
 		return trd, size
-
 

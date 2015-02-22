@@ -17,7 +17,8 @@ def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 	prc['high'] = price.resample(freq, how='max').fillna(value=0)
 	prc['close'] = price.resample(freq, how='last').fillna(method='ffill')
 	prc['volume'] = amount.resample(freq, how='sum').fillna(value=0)
-	
+	prc = prc.apply(replace_zero, axis=1)	
+
 	#|Add exchange, source, and freq columns if required
 	prc['freq'] = freq	
 	if exchange <> '':
@@ -36,6 +37,16 @@ def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 	#|Slice price data to cut off incomplete ends
 	prc = prc[1:-1]
 	return prc
+
+#|Replace zeros in open, low, and high with the last close
+def replace_zero(row):
+	if row['open'] == 0:
+		row['open'] = row['close']
+		row['low'] = row['close']
+		row['high'] = row['close']
+		return row
+	else:
+		return row
 
 #|Create datetime index for DataFrame using "timestamp" column
 def date_index(df):
@@ -66,3 +77,4 @@ def standard_columns(df):
 		cols.append(headers[col])
 	df.columns = cols
 	return df
+

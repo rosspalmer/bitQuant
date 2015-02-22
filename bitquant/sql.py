@@ -1,13 +1,19 @@
 import auth
 import tools
 
-import csv
 import numpy as np
-import pandas as pd
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
 from sqlalchemy import Table, Column, Integer, String, Float, DateTime
+from sqlalchemy.sql.expression import delete
+
+#|Create all tables in MySQL database
+def setup_tables():
+	db = dbconnect()
+	db.add_tbl('trades')
+	db.add_tbl('price')
+	db.add_tbl('exchanges',create='yes')
 
 #|------------------------------------------------------
 #|--------Connect to SQL data via dbconnect class-------
@@ -29,15 +35,18 @@ class dbconnect():
 			self.meta.create_all(self.eng)
 		return tbl
 
-	#|Insert DataFrame to SQL table using "INSERT OR IGNORE" command
-	def df_to_sql(self, df, table_name, update='no'):
+	#|Insert DataFrame to SQL table using types
+	#|(i) INSERT OR INGORE (d) Delete and insert
+	def df_to_sql(self, df, table_name, typ):
 		tbl = self.add_tbl(table_name)		
-		df = df.to_dict('records')		
-		if update == 'yes':
-			pass
-		else:		
+		data = df.to_dict('records')		
+		if typ == 'i':	
 			stmt = tbl.insert().prefix_with('IGNORE')
-		stmt.execute(df)
+		if typ == 'd':
+			stmt = tbl.delete()
+			stmt.execute()
+			stmt = tbl.insert().prefix_with('IGNORE')
+		stmt.execute(data)
 
 	#|Return DataFrame from SQL table using filter arguments
 	def sql_to_df(self, table_name, exchange='',  symbol='',
@@ -110,9 +119,9 @@ class dbconnect():
 #|--------Shortcut SQL <--> DataFrame commands--------
 
 #|Insert (or Ignore) Dataframe into SQL database
-def df_to_sql(df, table_name):
+def df_to_sql(df, table_name, typ='i'):
 	db = dbconnect()
-	db.df_to_sql(df, table_name)
+	db.df_to_sql(df, table_name, typ)
 
 #|Return trades data from SQL as DataFrame
 def trades_df(exchange='', symbol='', start ='', end=''):		
@@ -122,10 +131,10 @@ def trades_df(exchange='', symbol='', start ='', end=''):
 	return df
 
 #|Return price history from SQL using exchange/source filters as DataFrame
-def price_df(exchange='', freq='', source=''):
+def price_df(exchange='', freq='', source='',start=''):
 	db = dbconnect()
-	df = db.sql_to_df('price', exchange=exchange,
-			source=source, freq=freq)
+	df = db.sql_to_df('price', exchange=exchange, freq=freq,
+			source=source, start=start)
 	return df
 
 #|Return exchange information table from SQL as DataFrame
@@ -134,3 +143,4 @@ def exchanges_df(exchange='', symbol=''):
 	df = db.sql_to_df('exchanges',
 		exchange=exchange, symbol=symbol)
 	return df
+	

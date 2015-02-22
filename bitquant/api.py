@@ -1,10 +1,18 @@
 import tools
 import sql
 
-from urllib import urlopen
+import csv
+import codecs as co
 import json
 from pandas.io.json import json_normalize
 from pandas import DataFrame
+from urllib import urlopen
+
+#|Set default 'exchanges' table for API commands
+def set_default():
+	file_path = 'default.csv'
+	exc = DataFrame.from_csv(file_path, index_col=None)
+	sql.df_to_sql(exc, 'exchanges', 'd')
 
 #|Generic API GET request and return JSON data
 def get(request):	
@@ -27,8 +35,8 @@ class trades_api(object):
 	#|format GET data, and return DataFrame
 	def get_data(self):
 		request = self.trades_statement()
-		df = get(request)
-		df = self.format_data(df)
+		response = get(request)
+		df = self.format_data(response)
 		return df
 
 	#|Insert trades data into
@@ -46,19 +54,22 @@ class trades_api(object):
 		if self.limit <> '' and self.exc['limit'] <> 'None':
 			request = add_parameter(self.exc, request, 'limit', self.limit)
 		if self.since <> '' and self.exc['since'] <> 'None':
-			request = add_parameter(self.exc, request, 'since', self.since)
+			request = add_parameter(self.exc, request, 'since', self.since)		
 		return request
 
 	#|Normalize data from API request, standardize column headers,
 	#|and add 'exchange' and 'symbol' columns if not present
-	def format_data(self, df):
-		df = json_normalize(df)
+	def format_data(self, response):
+		if self.exchange == 'btce':
+			for col in response:
+				response = response[col]
+		df = json_normalize(response)
 		df = tools.standard_columns(df)
 		if 'exchange' not in df:
 			df['exchange'] = self.exchange
 		if 'symbol' not in df:
 			df['symbol'] = self.symbol
-		return df
+		return df			
 
 #|Add a parameter to the API request statement
 def add_parameter(exc, request, parameter, value=''):
@@ -70,16 +81,15 @@ def add_parameter(exc, request, parameter, value=''):
 	
 
 #|Import daily price data from Quandl API
-def quandl(sym, to_sql='no'):
-	request = 'https://www.quandl.com/api/v1/datasets/%s.json' % sym
+def quandl(exchange, symbol):
+	exc = sql.exchanges_df(exchange=exchange,symbol=symbol)
+	request = 'https://www.quandl.com/api/v1/datasets/%s.json' % exc['quandl']
 	response = get(request)
 	data = response['data']
 	headers = response['column_names']
-	df = DataFrame(data, columns=headers)
-	return df
+	prc = DataFrame(data, columns=headers)
+	return prc
 
-#|Set default 'exchanges' table for API commands
-def set_default():
-	file_path = 'default.csv'
-	exc = DataFrame.from_csv(file_path, index_col=None)
-	sql.df_to_sql(exc, 'exchanges', 'd')
+ping = trades_api('bitfinex','btcusd')
+trd = ping.bchart()
+print trd

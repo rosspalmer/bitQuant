@@ -8,3 +8,5 @@ okcoin,ltccny,https://www.okcoin.cn/api/v1,trades.do,None,since=,symbol=ltc_cny,
 bitstamp,btcusd,https://www.bitstamp.net/api,transactions,None,None,None,BCHARTS/BITSTAMPUSD,bitstampUSD,0
 btcchina,btccny,https://data.btcchina.com,data/historydata,limit=,since=,market=btccny,BAVERAGE/BTCCHINACNY,btcnCNY,0
 btcchina,ltccny,https://data.btcchina.com,data/historydata,limit=,since=,market=ltccny,None,None,0
+btce,btcusd,https://btc-e.com/api/3,trades/btc_usd,limit=,None,None,BCHARTS/BTCEUSD,btceUSD,0
+btce,ltcusd,https://btc-e.com/api/3,trades/ltc_usd,limit=,None,None,None,None,0
