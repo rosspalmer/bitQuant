@@ -1,4 +1,4 @@
-# bitQuant
+# bitQuant v0.2
 
 The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.
 
