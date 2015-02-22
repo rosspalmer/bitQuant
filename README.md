@@ -34,12 +34,12 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
   Input Host, Username, and Password in order to access MySQL Server
 
     >> import bitquant as bq
-    >> bq.auth.mysql_create()
+    >> bq.auth.mysql_setup()
 
 **(3) Upload default exchange API command library and create MySQL tables**
 
-    >> bq.api.set_default()
     >> bq.sql.setup_tables()
+    >> bq.api.set_default()
 
 ##Quickstart API Guide
 

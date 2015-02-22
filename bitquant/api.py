@@ -90,6 +90,3 @@ def quandl(exchange, symbol):
 	prc = DataFrame(data, columns=headers)
 	return prc
 
-ping = trades_api('bitfinex','btcusd')
-trd = ping.bchart()
-print trd
