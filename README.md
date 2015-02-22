@@ -22,87 +22,83 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
 ##Installation
 
 **(1a) Install via PyPi**
+
   `easy_install bitquant` or `pip install bitquant`
 
 **(1b) Install `setup.py` the hard way**
 
-  python setup.py install`
+    python setup.py install
 
 **(2) Setup MySQL database authorization**
 
   Input Host, Username, and Password in order to access MySQL Server
 
-  `python` or `ipython`
+    >> import bitquant as bq
+    >> bq.auth.mysql_create()
 
-    `>> import bitquant as bq`
+**(3) Upload default exchange API command library and create MySQL tables**
 
-    `>> bq.mysql_create()`
-
-**(3) Upload default exchange API command library**
-
-    `>> bq.set_default()`
+    >> bq.api.set_default()
+    >> bq.sql.setup_tables()
 
 ##Quickstart API Guide
 
-`python` or `ipython`
-
-    `>> import bitquant as bq`
+    >> import bitquant as bq
 
 ###Add Data to MySQL database
 
 Insert DataFrame into MySQL table
 
-    `>> bq.df_to_sql(df, table_name, typ='i'):`
+    >> bq.df_to_sql(df, table_name, typ='i'):
 
-Ping exchange API for trade history data, return DataFrame, and insert data
+Ping exchange API for trade history data, insert data, and return DataFrame
 
-    `>> ping = bq.trades_api(exchange, symbol, limit='', since='')`
+    >> ping = bq.trades_api(exchange, symbol, limit='', since='')
+    >> trade_history = ping.to_sql()
 
-    `>> trade_history = ping.to_sql()`
+Convert trade history to OLHCV price history, insert data, and return DataFrame
 
-Convert trade history to OLHCV price history, return DataFrame, and insert data
-
-    `>> top = bq.trades_to_price(exchange, symbol, freq, start)`
-
-    `>> price_history = top.to_sql()`
+    >> top = bq.trades_to_price(exchange, symbol, freq, start)
+    >> price_history = top.to_sql()
 
 ###Pull Data from MySQL/Quandl as pandas DataFrame
 
 Pull trade history data from MySQL database
 
-    `>> trade_history = bq.trades_df(exchange='', symbol='', start ='', end='')`
+    >> trade_history = bq.trades_df(exchange='', symbol='', start ='', end='')
 
 Pull price history data from MySQL database
 
-    `>> price_history = bq.price_df(exchange='', freq='', source='',start='')`
+    >> price_history = bq.price_df(exchange='', freq='', source='',start='')
 
 Pull EOD price history from Quandl API
 
-    `>> price_history = bq.quandl(exchange, symbol)`
+    >> price_history = bq.quandl(exchange, symbol)
 
 ###Maintain MySQL servers with `cron` class
 
-Create cron class
+Create `cron` class
 
-    `>> c = bq.cron()`
+    >> c = bq.cron()
 
-Add `job` for `cron` class (may add multiple jobs)
+Add `job` for cron class (may add multiple jobs)
 
-    `>> c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):`
+    >> c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):
 
-Run `cron` class, `length` should be the number of seconds for the cron job interval
+Run cron class, `length` should be the number of seconds for the cron job interval
 
-    `>> c.run(length)`
+    >> c.run(length)
 
 ##Variables
 
-**`exchange`: exchange name (default names)**
+**`exchange`: exchange name (supported)**
 - `bitfinex`
 - `bitstamp`
+- `btce`
 - `okcoin`
 - `btcchina`
 
-**`symbol`: symbol name (default names)**
+**`symbol`: symbol name (supported)**
 - `btcusd`
 - `ltcusd`
 - `btccny`
@@ -119,13 +115,23 @@ Run `cron` class, `length` should be the number of seconds for the cron job inte
 - `trades`: price data converted from MySQL trade history
 - `bchart`: price data converted from BitcoinChart csv file
 
+**`job`: job type for cron class**
+- `trades`: Ping API for trade data and add to MySQL (hard_time required)
+- `price`: Convert trade data to price data adn add to MySQL (freq required)
+
+**`hard_time`: time between instances of a job**
+- Input integer in seconds
+
 **`start`: start point of data set**
 - Input `m/d/yy` for start date
-- or input timestamp
+- or input UNIX timestamp
 
 **`end`: end point of data set**
 - Input `m/d/yy` for end date
-- or input timestamp
+- or input UNIX timestamp
 
+**`limit`: limit number of API response rows**
+- Input integer
 
-
+**`since`: pull API data starting from `since` trade id(tid)**
+- Input integer
