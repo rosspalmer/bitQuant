@@ -106,68 +106,29 @@ class dbconnect():
 				Column('bchart', String(20)),Column('last_touch', Integer))
 		return tbl
 
-#|-----------------------------------------------
-#|--------Trades to price converter class--------
+#|----------------------------------------------------
+#|--------Shortcut SQL <--> DataFrame commands--------
 
-#|Used to convert trade history in MySQL database to price (OLHCV) data
-class trades_to_price(object):
-	
-	def __init__(self, exchange, symbol, freq, start):
-		self.exchange = exchange
-		self.symbol = symbol
-		self.freq = freq
-		self.start = start
-
-	#|Pull trade data from SQL database, convert trades to price,
-	#|add to SQL price table, and return price DataFrame
-	def run(self):
-		prc = self.convert()
-		df_to_sql(prc, 'price')
-		return prc
-
-	#|Convert trade data to price data
-	def convert(self):
-		trd = trades_df(exchange=self.exchange,
-				symbol=self.symbol, start=self.start)
-		prc = tools.olhcv(trd, self.freq, tsmp_col='yes')
-		prc['source'] = 'trades'
-		return prc
-
-#|Convert bitcoin charts trade csv to price history
-def bchart_csv(exchange, symbol, freq, file_name, to_sql='no'):
-	file_path = 'csv/%s.csv' % file_name
-	trd = DataFrame.from_csv(file_path, header=None, index_col=None)
-	trd.columns = ['timestamp','price','amount']
-	trd = tools.date_index(trd)
-	prc = tools.olhcv(trd, freq, exchange, symbol, 'yes')
-	prc['source'] = 'bchart'
-	if to_sql == 'yes':
-		df_to_sql(prc, 'price')
-	return prc
-
-#|------------------------------------------------------
-#|--------Shortcut SQL to DataFrame commands--------
-
-#|Add Dataframe into SQL database
+#|Insert (or Ignore) Dataframe into SQL database
 def df_to_sql(df, table_name):
 	db = dbconnect()
 	db.df_to_sql(df, table_name)
 
-#|Pull trades data from SQL table and convert to DataFrame
+#|Return trades data from SQL as DataFrame
 def trades_df(exchange='', symbol='', start ='', end=''):		
 	db = dbconnect()	
 	df = db.sql_to_df('trades', exchange=exchange,
 			symbol=symbol, start=start, end=end)
 	return df
 
-#|Return price history DataFrame using exchange/source filters
+#|Return price history from SQL using exchange/source filters as DataFrame
 def price_df(exchange='', freq='', source=''):
 	db = dbconnect()
 	df = db.sql_to_df('price', exchange=exchange,
 			source=source, freq=freq)
 	return df
 
-#|Return exchange information table
+#|Return exchange information table from SQL as DataFrame
 def exchanges_df(exchange='', symbol=''):
 	db = dbconnect()
 	df = db.sql_to_df('exchanges',

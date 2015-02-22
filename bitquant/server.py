@@ -1,5 +1,5 @@
 import api
-import sql
+import data
 
 import pandas as pd
 import time as tm
@@ -74,11 +74,11 @@ class cron(object):
 
 	#|Convert trade data to price history
 	def update_price(self):
-		top = sql.trades_to_price(self.job['exchange'], self.job['symbol'],
+		top = data.trades_to_price(self.job['exchange'], self.job['symbol'],
 				self.job['freq'], int(self.job['start']))
-		prc = top.run()
-		if len(prc.index) > 0:
-			self.schedule_price(prc)
+		top.to_sql()
+		if len(top.prc.index) > 0:
+			self.schedule_price(top.prc)
 		else:
 			self.job['next'] = self.job['next'] + 20
 

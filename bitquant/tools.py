@@ -60,7 +60,7 @@ def standard_columns(df):
 		'amount':'amount',
 		'type':'type',		
 		'timestamp':'timestamp','date':'timestamp',
-		'timestamp_ms':'timestamp_ms',
+		'timestamp_ms':'timestamp_ms','date_ms':'timestamp_ms',
 		'exchange':'exchange'}
 	for col in df:
 		cols.append(headers[col])
