@@ -1,0 +1,10 @@
+exchange,symbol,url,trade,limit,since,market,quandl,bchart,last_touch
+bitfinex,btcusd,https://api.bitfinex.com/v1,trades/btcusd,limit_trades=,None,None,BCHARTS/BITFINEXUSD,bitfinexUSD,0
+bitfinex,ltcusd,https://api.bitfinex.com/v1,trades/ltcusd,limit_trades=,None,None,None,None,0
+okcoin,btcusd,https://www.okcoin.com/api/v1,trades.do,None,since=,symbol=btc_usd,BCHARTS/OKCOINUSD,None,0
+okcoin,ltcusd,https://www.okcoin.com/api/v1,trades.do,None,since=,symbol=ltc_usd,None,None,0
+okcoin,btccny,https://www.okcoin.cn/api/v1,trades.do,None,since=,symbol=btc_cny,BCHARTS/OKCOINCNY,None,0
+okcoin,ltccny,https://www.okcoin.cn/api/v1,trades.do,None,since=,symbol=ltc_cny,None,None,0
+bitstamp,btcusd,https://www.bitstamp.net/api,transactions,None,None,None,BCHARTS/BITSTAMPUSD,bitstampUSD,0
+btcchina,btccny,https://data.btcchina.com,data/historydata,limit=,since=,market=btccny,BAVERAGE/BTCCHINACNY,btcnCNY,0
+btcchina,ltccny,https://data.btcchina.com,data/historydata,limit=,since=,market=ltccny,None,None,0

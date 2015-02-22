@@ -1,8 +1,6 @@
 import tools
 import sql
 
-#import csv
-#import codecs as co
 from urllib import urlopen
 import json
 from pandas.io.json import json_normalize
@@ -72,7 +70,7 @@ def add_parameter(exc, request, parameter, value=''):
 	
 
 #|Import daily price data from Quandl API
-def quandl(sym, add_sql='no'):
+def quandl(sym, to_sql='no'):
 	request = 'https://www.quandl.com/api/v1/datasets/%s.json' % sym
 	response = get(request)
 	data = response['data']
@@ -80,3 +78,8 @@ def quandl(sym, add_sql='no'):
 	df = DataFrame(data, columns=headers)
 	return df
 
+#|Set default 'exchanges' table for API commands
+def set_default():
+	file_path = 'default.csv'
+	exc = DataFrame.from_csv(file_path, index_col=None)
+	sql.df_to_sql(exc, 'exchanges', 'd')
