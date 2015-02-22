@@ -1,4 +1,3 @@
-
 #|Load MySQL login information from text file in "auth" folder
 #|Create login string for SQLAlchemy engine
 def mysql(create='no'):
