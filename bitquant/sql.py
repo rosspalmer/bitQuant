@@ -2,8 +2,8 @@ import auth
 import tools
 
 import csv
-import codecs
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
@@ -141,6 +141,22 @@ class trades_to_price(object):
 		prc['source'] = 'trades'
 		return prc
 
+#|Convert bitcoin charts trade csv to price history
+def bchart_csv(exchange, symbol, freq, file_name, to_sql='no'):
+	file_path = 'csv/%s.csv' % file_name
+	trd = DataFrame.from_csv(file_path, header=None, index_col=None)
+	trd.columns = ['timestamp','price','amount']
+	trd = tools.date_index(trd)
+	trd['exchange'] = exchange
+	trd['symbol'] = symbol
+	prc = tools.olhcv(trd, freq)
+	prc['freq'] = freq
+	prc['source'] = 'bchart'
+	prc['timestamp'] = prc.index.astype(np.int64) // 10**9
+	if to_sql == 'yes':
+		df_to_sql(prc, 'price')
+	return prc
+
 #|------------------------------------------------------
 #|--------Shortcut SQL to DataFrame commands--------
 
@@ -176,3 +192,5 @@ def exchanges_df(exchange='', symbol=''):
 		exchange=exchange, symbol=symbol)
 	return df
 
+prc = bchart_csv('bitfinex','btcusd','h','bitfinexUSD', to_sql='yes')
+print prc
