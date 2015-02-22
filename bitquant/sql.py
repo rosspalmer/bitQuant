@@ -112,6 +112,9 @@ class dbconnect():
 				Column('last', Integer))
 		return tbl
 
+#|-----------------------------------------------
+#|--------Trades to price converter class--------
+
 #|Used to convert trade history in MySQL database to price (OLHCV) data
 class trades_to_price(object):
 	
@@ -132,12 +135,10 @@ class trades_to_price(object):
 	def convert(self):
 		trd = trades_df(exchange=self.exchange,
 				symbol=self.symbol, start=self.start)
-		print trd		
 		prc = tools.olhcv(trd, self.freq)
 		prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 		prc['freq'] = self.freq
 		prc['source'] = 'trades'
-		print prc
 		return prc
 
 #|------------------------------------------------------
