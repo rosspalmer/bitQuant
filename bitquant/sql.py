@@ -3,6 +3,7 @@ import tools
 
 import numpy as np
 from pandas import DataFrame
+from sqlite3 import dbapi2 as sqlite
 from sqlalchemy import create_engine,  MetaData
 from sqlalchemy.sql import select
 from sqlalchemy import Table, Column, Integer, String, Float, DateTime
@@ -23,8 +24,13 @@ class dbconnect():
 	
 	#|Connect to SQL database
 	def __init__(self):	
-		engine_str = auth.mysql()	
-		self.eng = create_engine(engine_str)	
+		engine_str = auth.sql()
+		if engine_str.find('sqlite') == 0:
+			self.sql = 'sqlite'
+			self.eng = create_engine(engine_str, module=sqlite)
+		else:
+			self.sql = 'mysql'
+			self.eng = create_engine(engine_str)
 		self.conn = self.eng.connect()	
 		self.meta = MetaData(self.eng)
 
@@ -40,13 +46,21 @@ class dbconnect():
 	def df_to_sql(self, df, table_name, typ):
 		tbl = self.add_tbl(table_name)		
 		data = df.to_dict('records')		
-		if typ == 'i':	
-			stmt = tbl.insert().prefix_with('IGNORE')
+		if typ == 'i':
+			stmt = self.sql_insert(tbl)
 		if typ == 'd':
 			stmt = tbl.delete()
 			stmt.execute()
-			stmt = tbl.insert().prefix_with('IGNORE')
+			stmt = self.sql_insert(tbl)
 		stmt.execute(data)
+
+	#Customize insert or ignore command for different SQLs
+	def sql_insert(self, tbl):
+		if self.sql == 'mysql':
+			stmt = tbl.insert().prefix_with('IGNORE')
+		if self.sql == 'sqlite':
+			stmt = tbl.insert().prefix_with('OR IGNORE')
+		return stmt
 
 	#|Return DataFrame from SQL table using filter arguments
 	def sql_to_df(self, table_name, exchange='',  symbol='',
