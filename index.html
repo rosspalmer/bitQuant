@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>bitQuant by rosspalmer</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>bitQuant</h1>
+        <h2>Bitcoin trade data gathering, backtesting, and algorithmic trading solution</h2>
+        <a href="https://github.com/rosspalmer/bitQuant" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="bitquant-v02" class="anchor" href="#bitquant-v02" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.2</h1>
+
+<p>The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.</p>
+
+<h3>
+<a id="data" class="anchor" href="#data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data</h3>
+
+<ul>
+<li>"Ping" exchange APIs for trade history data</li>
+<li>Convert trade history to OLHCV price history at any frequency</li>
+<li>Store trade or price history data from exchange APIs in MySQL server</li>
+<li>Automatically maintain and update MySQL server through cron job scripts</li>
+<li>Quandl API access for EOD data</li>
+<li>BitcoinCharts csv file support</li>
+</ul>
+
+<h3>
+<a id="backtest-in-development" class="anchor" href="#backtest-in-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Backtest (in development)</h3>
+
+<ul>
+<li>Backtest trading algorithms against collected data</li>
+<li>Event driven backtester</li>
+<li>Easy intergration of indicators and strategies</li>
+</ul>
+
+<h3>
+<a id="live-in-planning" class="anchor" href="#live-in-planning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Live (in planning)</h3>
+
+<ul>
+<li>Run trading algorithms live for multiple exchanges</li>
+<li>Compatiable with backtest algorithms</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><strong>(1) Install via PyPi</strong></p>
+
+<p><code>easy_install bitquant</code> or <code>pip install bitquant</code></p>
+
+<p><strong>(2) Configure SQL database</strong></p>
+
+<p>Run SQL access setup and create SQL tables</p>
+
+<p>Supported: sqlite MySQL</p>
+
+<pre><code>&gt;&gt; import bitquant as bq
+&gt;&gt; bq.sql.setup()
+</code></pre>
+
+<h2>
+<a id="quickstart-api-guide" class="anchor" href="#quickstart-api-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart API Guide</h2>
+
+<pre><code>&gt;&gt; import bitquant as bq
+</code></pre>
+
+<h3>
+<a id="add-data-to-mysql-database" class="anchor" href="#add-data-to-mysql-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add Data to MySQL database</h3>
+
+<p>Insert DataFrame into MySQL table</p>
+
+<pre><code>&gt;&gt; bq.df_to_sql(df, table_name, typ='i'):
+</code></pre>
+
+<p>Ping exchange API for trade history data, insert data, and return DataFrame</p>
+
+<pre><code>&gt;&gt; ping = bq.request(exchange, symbol, limit='', since='')
+&gt;&gt; trade_history = ping.to_sql()
+</code></pre>
+
+<p>Convert trade history to OLHCV price history, insert data, and return DataFrame</p>
+
+<pre><code>&gt;&gt; top = bq.trades_to_price(exchange, symbol, freq, start)
+&gt;&gt; price_history = top.to_sql()
+</code></pre>
+
+<p>Upload trade history csv from <a href="http://api.bitcoincharts.com/v1/csv/">BitcoinCharts</a> and return price history</p>
+
+<pre><code>&gt;&gt; price_history = bq.bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
+</code></pre>
+
+<h3>
+<a id="pull-data-from-mysqlquandl-as-pandas-dataframe" class="anchor" href="#pull-data-from-mysqlquandl-as-pandas-dataframe" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pull Data from MySQL/Quandl as pandas DataFrame</h3>
+
+<p>Pull trade history data from MySQL database</p>
+
+<pre><code>&gt;&gt; trade_history = bq.trades_df(exchange='', symbol='', start ='', end='')
+</code></pre>
+
+<p>Pull price history data from MySQL database</p>
+
+<pre><code>&gt;&gt; price_history = bq.price_df(exchange='', freq='', source='',start='')
+</code></pre>
+
+<p>Pull EOD price history from Quandl API</p>
+
+<pre><code>&gt;&gt; price_history = bq.quandl(exchange, symbol)
+</code></pre>
+
+<h3>
+<a id="maintain-mysql-servers-with-cron-class" class="anchor" href="#maintain-mysql-servers-with-cron-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maintain MySQL servers with <code>cron</code> class</h3>
+
+<p>Create <code>cron</code> class</p>
+
+<pre><code>&gt;&gt; c = bq.cron()
+</code></pre>
+
+<p>Add <code>job</code> for cron class (may add multiple jobs)</p>
+
+<pre><code>&gt;&gt; c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):
+</code></pre>
+
+<p>Run cron class, <code>length</code> should be the number of seconds for the cron job interval</p>
+
+<pre><code>&gt;&gt; c.run(length)
+</code></pre>
+
+<h2>
+<a id="variables" class="anchor" href="#variables" aria-hidden="true"><span class="octicon octicon-link"></span></a>Variables</h2>
+
+<p><strong><code>exchange</code>: exchange name (supported)</strong></p>
+
+<ul>
+<li><code>bitfinex</code></li>
+<li><code>bitstamp</code></li>
+<li><code>btce</code></li>
+<li><code>okcoin</code></li>
+<li><code>btcchina</code></li>
+</ul>
+
+<p><strong><code>symbol</code>: symbol name (supported)</strong></p>
+
+<ul>
+<li><code>btcusd</code></li>
+<li><code>ltcusd</code></li>
+<li><code>btccny</code></li>
+<li><code>ltccny</code></li>
+</ul>
+
+<p><strong><code>freq</code>: frequency of OLHCV price data</strong></p>
+
+<ul>
+<li>
+<code>min</code>: minute</li>
+<li>
+<code>xmin</code>: x minute (for integer x)</li>
+<li>
+<code>h</code>: hour</li>
+<li>
+<code>d</code>: day</li>
+<li>
+<code>m</code>: month</li>
+</ul>
+
+<p><strong><code>source</code>: source of trade data for price history</strong></p>
+
+<ul>
+<li>
+<code>trades</code>: price data converted from MySQL trade history</li>
+<li>
+<code>bchart</code>: price data converted from BitcoinChart csv file</li>
+</ul>
+
+<p><strong><code>job</code>: job type for cron class</strong></p>
+
+<ul>
+<li>
+<code>trades</code>: Ping API for trade data and add to MySQL (hard_time required)</li>
+<li>
+<code>price</code>: Convert trade data to price data adn add to MySQL (freq required)</li>
+</ul>
+
+<p><strong><code>hard_time</code>: time between instances of a job</strong></p>
+
+<ul>
+<li>Input integer in seconds</li>
+</ul>
+
+<p><strong><code>start</code>: start point of data set</strong></p>
+
+<ul>
+<li>Input <code>m/d/yy</code> for start date</li>
+<li>or input UNIX timestamp</li>
+</ul>
+
+<p><strong><code>end</code>: end point of data set</strong></p>
+
+<ul>
+<li>Input <code>m/d/yy</code> for end date</li>
+<li>or input UNIX timestamp</li>
+</ul>
+
+<p><strong><code>limit</code>: limit number of API response rows</strong></p>
+
+<ul>
+<li>Input integer</li>
+</ul>
+
+<p><strong><code>since</code>: pull API data starting from <code>since</code> trade id(tid)</strong></p>
+
+<ul>
+<li>Input integer</li>
+</ul>
+
+<p><strong><code>to_sql</code>: insert returned data into MySQL database</strong></p>
+
+<ul>
+<li>'no' (default) or 'yes'</li>
+</ul>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/rosspalmer/bitQuant/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/rosspalmer/bitQuant/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/rosspalmer/bitQuant"></a> is maintained by <a href="https://github.com/rosspalmer">rosspalmer</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
