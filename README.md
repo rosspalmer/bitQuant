@@ -21,25 +21,19 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
 
 ##Installation
 
-**(1a) Install via PyPi**
+**(1) Install via PyPi**
 
   `easy_install bitquant` or `pip install bitquant`
 
-**(1b) Install `setup.py` the hard way**
+**(2) Configure SQL database**
 
-    python setup.py install
-
-**(2) Setup SQL database**
-
-Run SQL setup script, choose sqlite or MySQL
+Run SQL access setup and create SQL tables
+- **Supported SQL versions**
+- sqlite
+- MySQL
 
     >> import bitquant as bq
-    >> bq.auth.sql_setup()
-
-**(3) Upload default exchange API command library and create MySQL tables**
-
-    >> bq.sql.setup_tables()
-    >> bq.api.set_default()
+    >> bq.sql.setup()
 
 ##Quickstart API Guide
 
@@ -53,7 +47,7 @@ Insert DataFrame into MySQL table
 
 Ping exchange API for trade history data, insert data, and return DataFrame
 
-    >> ping = bq.trades_api(exchange, symbol, limit='', since='')
+    >> ping = bq.request(exchange, symbol, limit='', since='')
     >> trade_history = ping.to_sql()
 
 Convert trade history to OLHCV price history, insert data, and return DataFrame

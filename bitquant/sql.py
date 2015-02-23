@@ -10,11 +10,11 @@ from sqlalchemy import Table, Column, Integer, String, Float, DateTime
 from sqlalchemy.sql.expression import delete
 
 #|Create all tables in MySQL database
-def setup_tables():
+def setup():
+	auth.sql_setup()
 	db = dbconnect()
 	db.add_tbl('trades')
-	db.add_tbl('price')
-	db.add_tbl('exchanges',create='yes')
+	db.add_tbl('price',create='yes')
 
 #|------------------------------------------------------
 #|--------Connect to SQL data via dbconnect class-------
@@ -91,11 +91,7 @@ class dbconnect():
 		headers = result.keys()
 		result = result.fetchall()
 		df = DataFrame(result, columns=headers)
-		#|Create datetime index if data has 'timestamp' column		
-		try:		
-			df = tools.date_index(df)
-		except:
-			pass
+		df = tools.date_index(df)
 		return df
 	
 	#|Load SQLAlchemy table into MetaData with option to 'create'
@@ -119,14 +115,6 @@ class dbconnect():
 				Column('high', Float), Column('close', Float),
 				Column('volume', Float),
 				Column('source', String(10), primary_key=True))
-		if table_name == 'exchanges':
-			tbl = Table(table_name, self.meta,
-				Column('exchange', String(20), primary_key=True),
-				Column('symbol', String(6), primary_key=True),
-				Column('url', String(50)), Column('trade', String(50)),
-				Column('limit', String(20)), Column('since', String(20)),
-				Column('market', String(20)),Column('quandl', String(50)), 
-				Column('bchart', String(20)),Column('last_touch', Integer))
 		return tbl
 
 #|----------------------------------------------------
@@ -149,12 +137,5 @@ def price_df(exchange='', freq='', source='',start=''):
 	db = dbconnect()
 	df = db.sql_to_df('price', exchange=exchange, freq=freq,
 			source=source, start=start)
-	return df
-
-#|Return exchange information table from SQL as DataFrame
-def exchanges_df(exchange='', symbol=''):
-	db = dbconnect()
-	df = db.sql_to_df('exchanges',
-		exchange=exchange, symbol=symbol)
 	return df
 	

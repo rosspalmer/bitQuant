@@ -57,8 +57,11 @@ def date_index(df):
 	return df
 
 #|Convert datetime sting (format: mm/dd/yy) to timestamp
-def dateconv(date):	
-	date = datetime.strptime(date, "%m/%d/%y")		
+def dateconv(date):
+	try:
+		date = datetime.strptime(date, "%m/%d/%y")
+	except:
+		date = datetime.strptime(date, "%Y-%m-%d")		
 	timestamp = int(mktime(date.timetuple()))		
 	return timestamp
 
@@ -74,7 +77,10 @@ def standard_columns(df):
 		'timestamp_ms':'timestamp_ms','date_ms':'timestamp_ms',
 		'exchange':'exchange'}
 	for col in df:
-		cols.append(headers[col])
+		if col in headers.keys():
+			cols.append(headers[col])
+		else:
+			df = df.drop(col, axis=1)
 	df.columns = cols
 	return df
 

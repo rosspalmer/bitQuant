@@ -8,8 +8,8 @@ config = {
 	'author': 'ross palmer',
 	'url':'https://github.com/rosspalmer/bitQuant',
 	'license':'MIT',
-	'version': '0.2.3',
-	'install_requires': ['SQLAlchemy','pandas','numpy','scipy','PyMySQL','sqlite3'],
+	'version': '0.2.6',
+	'install_requires': ['SQLAlchemy','pandas','numpy','scipy','PyMySQL'],
 	'packages': ['bitquant'],
 	'scripts': [],
 	'name':'bitquant'
