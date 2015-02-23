@@ -28,9 +28,8 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
 **(2) Configure SQL database**
 
 Run SQL access setup and create SQL tables
-- **Supported SQL versions**
-- sqlite
-- MySQL
+
+Supported: sqlite MySQL
 
     >> import bitquant as bq
     >> bq.sql.setup()
