@@ -10,3 +10,5 @@ btcchina,btccny,https://data.btcchina.com,data/historydata,limit=,since=,market=
 btcchina,ltccny,https://data.btcchina.com,data/historydata,limit=,since=,market=ltccny,None,None,0
 btce,btcusd,https://btc-e.com/api/3,trades/btc_usd,limit=,None,None,BCHARTS/BTCEUSD,btceUSD,0
 btce,ltcusd,https://btc-e.com/api/3,trades/ltc_usd,limit=,None,None,None,None,0
+kraken,btceur,https://api.kraken.com/0,public/Trades,None,None,pair=BTCEUR,BCHARTS/KRAKENEUR,None,0
+kraken,ltceur,https://api.kraken.com/0,public/Trades,None,None,pair=LTCEUR,None,None,0

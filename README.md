@@ -29,12 +29,12 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
 
     python setup.py install
 
-**(2) Setup MySQL database authorization**
+**(2) Setup SQL database**
 
-  Input Host, Username, and Password in order to access MySQL Server
+Run SQL setup script, choose sqlite or MySQL
 
     >> import bitquant as bq
-    >> bq.auth.mysql_setup()
+    >> bq.auth.sql_setup()
 
 **(3) Upload default exchange API command library and create MySQL tables**
 
