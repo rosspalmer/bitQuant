@@ -31,7 +31,6 @@ class request(object):
 		if typ == 'quandl' and 'quandl' in self.cmd.keys():
 			self.stmt += 'https://www.quandl.com/api/v1/datasets/%s.json'\
 					% self.cmd['quandl']
-		print self.stmt
 
 	#|Add a parameter to the API request statement
 	def add_parameter(self, parameter):

@@ -9,8 +9,8 @@ import time as tm
 class cron(object):
 	
 	def __init__(self):
-		self.schedule = pd.DataFrame(columns=('exchange','symbol','job','limit',
-					'since','freq','hard_time','start','next'))
+		self.schedule = pd.DataFrame(columns=('exchange','symbol','job','freq','next','hard_time','limit',
+					'since','start'))
 		self.job = {}
 
 	#|Add a trade "ping" job or convert trade to price
@@ -26,9 +26,16 @@ class cron(object):
 		self.job = self.schedule.iloc[0].to_dict()	
 
 	#|Run cron job for set length (in seconds)
-	def run(self, length):
+	def run(self, length, log='no'):
 		stop = tm.time() + length
 		while tm.time()	<= stop:
+			if log == 'yes':
+				print				
+				print '----Current Timestamp: %s -------' % str(tm.time())
+				print 'Next job: %s seconds'% str(self.schedule['next'].min() - tm.time())		
+				print
+				print self.schedule.sort('next')
+				print			
 			self.sleep()
 			self.update()	
 
@@ -67,8 +74,8 @@ class cron(object):
 
 	#|Ping exchange API and add data to MySQL server
 	def update_trades(self):
-		ping = api.trades_api(self.job['exchange'], self.job['symbol'], 
-				limit=self.job['limit'],since=self.job['since'])
+		ping = api.request(self.job['exchange'], self.job['symbol'], 
+				limit=self.job['limit'], since=self.job['since'])
 		trd = ping.to_sql()
 		self.schedule_trades()
 

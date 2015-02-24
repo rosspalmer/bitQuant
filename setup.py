@@ -4,11 +4,11 @@ except ImportError:
 	from distutils.core import setup
 
 config = {
-	'description':'bitQuant',
+	'description':'End to end solution for bitcoin data gathering, backtesting, and live trading',
 	'author': 'ross palmer',
-	'url':'https://github.com/rosspalmer/bitQuant',
+	'url':'http://rosspalmer.github.io/bitQuant/',
 	'license':'MIT',
-	'version': '0.2.6',
+	'version': '0.2.7',
 	'install_requires': ['SQLAlchemy','pandas','numpy','scipy','PyMySQL'],
 	'packages': ['bitquant'],
 	'scripts': [],
