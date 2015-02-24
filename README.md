@@ -34,6 +34,10 @@ Supported: sqlite MySQL
     >> import bitquant as bq
     >> bq.sql.setup()
 
+##Tutorials
+
+- **[Basics](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Basics)**
+
 ##Quickstart API Guide
 
     >> import bitquant as bq
