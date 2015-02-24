@@ -1,12 +1,12 @@
-# bitQuant v0.2
+# bitQuant v0.2.7
 
 The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.
 
 ###Data
 - "Ping" exchange APIs for trade history data
 - Convert trade history to OLHCV price history at any frequency
-- Store trade or price history data from exchange APIs in MySQL server
-- Automatically maintain and update MySQL server through cron job scripts
+- Store trade or price history data from in SQL server
+- Automatically maintain and update SQL data
 - Quandl API access for EOD data
 - BitcoinCharts csv file support
 
