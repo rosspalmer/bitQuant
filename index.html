@@ -120,73 +120,6 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 </code></pre>
 
 <h2>
-<a id="quickstart-api-guide" class="anchor" href="#quickstart-api-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart API Guide</h2>
-
-<pre><code>&gt;&gt; import bitquant as bq
-</code></pre>
-
-<h3>
-<a id="add-data-to-mysql-database" class="anchor" href="#add-data-to-mysql-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add Data to MySQL database</h3>
-
-<p>Insert DataFrame into MySQL table</p>
-
-<pre><code>&gt;&gt; bq.df_to_sql(df, table_name, typ='i'):
-</code></pre>
-
-<p>Ping exchange API for trade history data, insert data, and return DataFrame</p>
-
-<pre><code>&gt;&gt; ping = bq.request(exchange, symbol, limit='', since='')
-&gt;&gt; trade_history = ping.to_sql()
-</code></pre>
-
-<p>Convert trade history to OLHCV price history, insert data, and return DataFrame</p>
-
-<pre><code>&gt;&gt; top = bq.trades_to_price(exchange, symbol, freq, start)
-&gt;&gt; price_history = top.to_sql()
-</code></pre>
-
-<p>Upload trade history csv from <a href="http://api.bitcoincharts.com/v1/csv/">BitcoinCharts</a> and return price history</p>
-
-<pre><code>&gt;&gt; price_history = bq.bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
-</code></pre>
-
-<h3>
-<a id="pull-data-from-mysqlquandl-as-pandas-dataframe" class="anchor" href="#pull-data-from-mysqlquandl-as-pandas-dataframe" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pull Data from MySQL/Quandl as pandas DataFrame</h3>
-
-<p>Pull trade history data from MySQL database</p>
-
-<pre><code>&gt;&gt; trade_history = bq.trades_df(exchange='', symbol='', start ='', end='')
-</code></pre>
-
-<p>Pull price history data from MySQL database</p>
-
-<pre><code>&gt;&gt; price_history = bq.price_df(exchange='', freq='', source='',start='')
-</code></pre>
-
-<p>Pull EOD price history from Quandl API</p>
-
-<pre><code>&gt;&gt; price_history = bq.quandl(exchange, symbol)
-</code></pre>
-
-<h3>
-<a id="maintain-mysql-servers-with-cron-class" class="anchor" href="#maintain-mysql-servers-with-cron-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maintain MySQL servers with <code>cron</code> class</h3>
-
-<p>Create <code>cron</code> class</p>
-
-<pre><code>&gt;&gt; c = bq.cron()
-</code></pre>
-
-<p>Add <code>job</code> for cron class (may add multiple jobs)</p>
-
-<pre><code>&gt;&gt; c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):
-</code></pre>
-
-<p>Run cron class, <code>length</code> should be the number of seconds for the cron job interval</p>
-
-<pre><code>&gt;&gt; c.run(length)
-</code></pre>
-
-<h2>
 <a id="variables" class="anchor" href="#variables" aria-hidden="true"><span class="octicon octicon-link"></span></a>Variables</h2>
 
 <p><strong><code>exchange</code>: exchange name (supported)</strong></p>
@@ -272,6 +205,73 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 <ul>
 <li>Input integer</li>
 </ul>
+
+<h2>
+<a id="quickstart-api-guide" class="anchor" href="#quickstart-api-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart API Guide</h2>
+
+<pre><code>&gt;&gt; import bitquant as bq
+</code></pre>
+
+<h3>
+<a id="add-data-to-mysql-database" class="anchor" href="#add-data-to-mysql-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add Data to MySQL database</h3>
+
+<p>Insert DataFrame into MySQL table</p>
+
+<pre><code>&gt;&gt; bq.df_to_sql(df, table_name, typ='i'):
+</code></pre>
+
+<p>Ping exchange API for trade history data, insert data, and return DataFrame</p>
+
+<pre><code>&gt;&gt; ping = bq.request(exchange, symbol, limit='', since='')
+&gt;&gt; trade_history = ping.to_sql()
+</code></pre>
+
+<p>Convert trade history to OLHCV price history, insert data, and return DataFrame</p>
+
+<pre><code>&gt;&gt; top = bq.trades_to_price(exchange, symbol, freq, start)
+&gt;&gt; price_history = top.to_sql()
+</code></pre>
+
+<p>Upload trade history csv from <a href="http://api.bitcoincharts.com/v1/csv/">BitcoinCharts</a> and return price history</p>
+
+<pre><code>&gt;&gt; price_history = bq.bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
+</code></pre>
+
+<h3>
+<a id="pull-data-from-mysqlquandl-as-pandas-dataframe" class="anchor" href="#pull-data-from-mysqlquandl-as-pandas-dataframe" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pull Data from MySQL/Quandl as pandas DataFrame</h3>
+
+<p>Pull trade history data from MySQL database</p>
+
+<pre><code>&gt;&gt; trade_history = bq.trades_df(exchange='', symbol='', start ='', end='')
+</code></pre>
+
+<p>Pull price history data from MySQL database</p>
+
+<pre><code>&gt;&gt; price_history = bq.price_df(exchange='', freq='', source='',start='')
+</code></pre>
+
+<p>Pull EOD price history from Quandl API</p>
+
+<pre><code>&gt;&gt; price_history = bq.quandl(exchange, symbol)
+</code></pre>
+
+<h3>
+<a id="maintain-mysql-servers-with-cron-class" class="anchor" href="#maintain-mysql-servers-with-cron-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maintain MySQL servers with <code>cron</code> class</h3>
+
+<p>Create <code>cron</code> class</p>
+
+<pre><code>&gt;&gt; c = bq.cron()
+</code></pre>
+
+<p>Add <code>job</code> for cron class (may add multiple jobs)</p>
+
+<pre><code>&gt;&gt; c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):
+</code></pre>
+
+<p>Run cron class, <code>length</code> should be the number of seconds for the cron job interval</p>
+
+<pre><code>&gt;&gt; c.run(length, log='no')
+</code></pre>
 
 <p><strong><code>to_sql</code>: insert returned data into MySQL database</strong></p>
 
