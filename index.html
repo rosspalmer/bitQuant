@@ -88,6 +88,38 @@
 </ul>
 
 <h2>
+<a id="speed-test" class="anchor" href="#speed-test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Speed test</h2>
+
+<p>Most data interactions are much smaller and instantaneous but here is a test at maximum conditions.</p>
+
+<p>The <code>bchart_csv</code> function will upload a 800MB <a href="http://api.bitcoincharts.com/v1/csv/">csv file</a> which contains the entire BTCChina trade history of 18.3+ million trades.</p>
+
+<p>The data is then converted to OLHCV price history with a 30 min period.</p>
+
+<p>Finally, the price history is inserted into a low-budget remote low-budget MySQL server ~1,000 miles away.</p>
+
+<p>The whole process takes 26 seconds.</p>
+
+<pre><code>**Total time: 25.9832 s**
+File: data.py
+Function: bchart_csv at line 32
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    32                                           @profile
+    33                                           def bchart_csv(exchange, symbol, freq, file_path,
+    34         1      6807633 6807633.0     26.2    trd = DataFrame.from_csv(file_path, header=None,
+    35         1           49     49.0      0.0     print len(trd.index)
+    36         1          129    129.0      0.0     trd.columns = ['timestamp','price','amount']
+    37         1      2034294 2034294.0      7.8    trd = tools.date_index(trd)
+    38         1      7093593 7093593.0     27.3    prc = tools.olhcv(trd, freq, exchange, symbol, 'yes')
+    39         1         3316   3316.0      0.0     prc['source'] = 'bchart'
+    40         1            1      1.0      0.0     if to_sql == 'yes':
+    41         1     10044148 10044148.0     38.7       sql.df_to_sql(prc, 'price')
+    42         1            3      3.0      0.0     return prc
+</code></pre>
+
+<h2>
 <a id="quickstart-api-guide" class="anchor" href="#quickstart-api-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart API Guide</h2>
 
 <pre><code>&gt;&gt; import bitquant as bq
