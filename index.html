@@ -92,13 +92,13 @@
 
 <p>Most data interactions are instantaneous but I wanted to test the module with a very large dataset.</p>
 
-<p>The <code>bchart_csv</code> function will upload a 800MB <a href="http://api.bitcoincharts.com/v1/csv/">csv file</a> which contains the entire BTCChina trade history of 18.3+ million trades.</p>
+<p>The <code>bchart_csv</code> function will upload a 800MB <a href="http://api.bitcoincharts.com/v1/csv/">csv file</a> from BitcoinCharts which contains the complete BTCChina trades history of over 18 million trades (ie. rows).</p>
 
 <p>The data is then converted to OLHCV price history with a 30 min period.</p>
 
 <p>Finally, the price history is inserted into a low-budget remote low-budget MySQL server ~1,000 miles away.</p>
 
-<p>The whole process took 26 seconds.</p>
+<p>The whole process took only 26 seconds.</p>
 
 <pre><code>**Total time: 25.9832 s**
 File: data.py
