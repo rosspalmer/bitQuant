@@ -39,6 +39,83 @@ Supported: sqlite MySQL
 - **[Basics](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Basics)**
 - **[Data Maintenance](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Data-Maintenance)**
 
+##Speed test
+
+Most data interactions are instantaneous but I wanted to test the module with a very large dataset.
+
+The `bchart_csv` function will upload a 800MB [csv file](http://api.bitcoincharts.com/v1/csv/) from BitcoinCharts which contains the complete BTCChina trades history of over 18 million trades (ie. rows).
+
+The data is then converted to OLHCV price history with a 30 min period.
+
+Finally, the price history is inserted into a low-budget remote low-budget MySQL server ~1,000 miles away.
+
+The whole process took only 26 seconds.
+
+    **Total time: 25.9832 s**
+    File: data.py
+    Function: bchart_csv at line 32
+
+    Line #      Hits         Time  Per Hit   % Time  Line Contents
+    ==============================================================
+        32                                           @profile
+        33                                           def bchart_csv(exchange, symbol, freq, file_path,
+        34         1      6.80763 6807633.0     26.2  	trd = DataFrame.from_csv(file_path, header=None,
+        35         1           49     49.0      0.0  	print len(trd.index)
+        36         1          129    129.0      0.0  	trd.columns = ['timestamp','price','amount']
+        37         1      2.03429 2034294.0     7.8  	trd = tools.date_index(trd)
+        38         1      7.09359 7093593.0     27.3  	prc = tools.olhcv(trd, freq, exchange, symbol, 'yes')
+        39         1         3316   3316.0      0.0  	prc['source'] = 'bchart'
+        40         1            1      1.0      0.0  	if to_sql == 'yes':
+        41         1     10.04414 10044148.0    38.7  		sql.df_to_sql(prc, 'price')
+        42         1            3      3.0      0.0  	return prc
+
+##Variables
+
+**`exchange`: exchange name (supported)**
+- `bitfinex`
+- `bitstamp`
+- `btce`
+- `okcoin`
+- `btcchina`
+
+**`symbol`: symbol name (supported)**
+- `btcusd`
+- `ltcusd`
+- `btccny`
+- `ltccny`
+
+**`freq`: frequency of OLHCV price data**
+- `min`: minute
+- `xmin`: x minute (for integer x)
+- `h`: hour
+- `d`: day
+- `m`: month
+
+**`source`: source of trade data for price history**
+- `trades`: price data converted from MySQL trade history
+- `bchart`: price data converted from BitcoinChart csv file
+
+**`job`: job type for cron class**
+- `trades`: Ping API for trade data and add to MySQL (hard_time required)
+- `price`: Convert trade data to price data adn add to MySQL (freq required)
+
+**`hard_time`: time between instances of a job**
+- Input integer in seconds
+
+**`start`: start point of data set**
+- Input `m/d/yy` for start date
+- or input UNIX timestamp
+
+**`end`: end point of data set**
+- Input `m/d/yy` for end date
+- or input UNIX timestamp
+
+**`limit`: limit number of API response rows**
+- Input integer
+
+**`since`: pull API data starting from `since` trade id(tid)**
+- Input integer
+
 ##Quickstart API Guide
 
     >> import bitquant as bq
@@ -89,54 +166,8 @@ Add `job` for cron class (may add multiple jobs)
 
 Run cron class, `length` should be the number of seconds for the cron job interval
 
-    >> c.run(length)
-
-##Variables
-
-**`exchange`: exchange name (supported)**
-- `bitfinex`
-- `bitstamp`
-- `btce`
-- `okcoin`
-- `btcchina`
-
-**`symbol`: symbol name (supported)**
-- `btcusd`
-- `ltcusd`
-- `btccny`
-- `ltccny`
-
-**`freq`: frequency of OLHCV price data**
-- `min`: minute
-- `xmin`: x minute (for integer x)
-- `h`: hour
-- `d`: day
-- `m`: month
-
-**`source`: source of trade data for price history**
-- `trades`: price data converted from MySQL trade history
-- `bchart`: price data converted from BitcoinChart csv file
-
-**`job`: job type for cron class**
-- `trades`: Ping API for trade data and add to MySQL (hard_time required)
-- `price`: Convert trade data to price data adn add to MySQL (freq required)
-
-**`hard_time`: time between instances of a job**
-- Input integer in seconds
-
-**`start`: start point of data set**
-- Input `m/d/yy` for start date
-- or input UNIX timestamp
-
-**`end`: end point of data set**
-- Input `m/d/yy` for end date
-- or input UNIX timestamp
-
-**`limit`: limit number of API response rows**
-- Input integer
-
-**`since`: pull API data starting from `since` trade id(tid)**
-- Input integer
+    >> c.run(length, log='no')
 
 **`to_sql`: insert returned data into MySQL database**
 - 'no' (default) or 'yes'
+
