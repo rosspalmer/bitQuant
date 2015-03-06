@@ -8,7 +8,8 @@ from datetime import datetime
 def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 
 	price = trd['price']	
-	amount = trd['amount']	
+	amount = trd['amount']
+	priceamprod = price * amount	
 	prc = DataFrame(index=price.resample(freq, how='last').index)	
 	
 	#|Use pandas 'resample' function to create OLHCV data
@@ -17,6 +18,9 @@ def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 	prc['high'] = price.resample(freq, how='max').fillna(value=0)
 	prc['close'] = price.resample(freq, how='last').fillna(method='ffill')
 	prc['volume'] = amount.resample(freq, how='sum').fillna(value=0)
+	# avoiding zeros in volume for VWAP
+	vwap = priceamprod.resample(freq, how='sum') / amount.resample(freq, how='sum')
+	prc['vwap'] = vwap.fillna(value=0)
 	prc = prc.apply(replace_zero, axis=1)	
 
 	#|Add exchange, source, and freq columns if required

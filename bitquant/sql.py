@@ -113,7 +113,7 @@ class dbconnect():
 				Column('freq', String(5), primary_key=True),
 				Column('open', Float), Column('low', Float),
 				Column('high', Float), Column('close', Float),
-				Column('volume', Float),
+				Column('volume', Float), Column('vwap', Float),
 				Column('source', String(10), primary_key=True))
 		return tbl
 
