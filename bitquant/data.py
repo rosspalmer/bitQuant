@@ -8,11 +8,12 @@ from pandas import DataFrame
 class trades_to_price(object):
 	
 	#|Set variables and convert trade data to price data
-	def __init__(self, exchange, symbol, freq, start):
+	def __init__(self, exchange, symbol, freq, start=0, name=''):
 		self.exchange = exchange
 		self.symbol = symbol
 		self.freq = freq
 		self.start = start
+		self.name = name
 		self.prc = self.convert()
 
 	#|Insert price data into SQL database
@@ -22,9 +23,26 @@ class trades_to_price(object):
 
 	#|Convert trade data to price data
 	def convert(self):
-		trd = sql.trades_df(exchange=self.exchange,
-				symbol=self.symbol, start=self.start)
-		prc = tools.olhcv(trd, self.freq, tsmp_col='yes')
+
+		#|Pull trade data from SQL and filter if needed
+		if isinstance(self.exchange, list):
+			trd = sql.trades_df(symbol=self.symbol, start=self.start)						
+			trd = trd[trd['exchange'].isin(self.exchange)]
+		elif self.exchange == 'all':
+			trd = sql.trades_df(symbol=self.symbol, start=self.start)
+		else:
+			trd = sql.trades_df(exchange=self.exchange, symbol=self.symbol, 
+					start=self.start)
+
+		#|Run OLHCV conversion with appropriate 'exchange' label
+		if self.name <> '':
+			prc = tools.olhcv(trd, self.freq, tsmp_col='yes', 
+					exchange=self.name)
+		elif self.exchange == 'all' or isinstance(self.exchange, list):
+			prc = tools.olhcv(trd, self.freq, tsmp_col='yes', 
+					exchange='multi')
+		else:
+			prc = tools.olhcv(trd, self.freq, tsmp_col='yes')
 		prc['source'] = 'trades'
 		return prc
 
