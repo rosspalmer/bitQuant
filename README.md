@@ -1,4 +1,4 @@
-# bitQuant v0.2.7
+# bitQuant v0.2.8
 
 The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.
 
@@ -117,6 +117,9 @@ The whole process took only 26 seconds.
 **`since`: pull API data starting from `since` trade id(tid)**
 - Input integer
 
+**`to_sql`: insert returned data into MySQL database**
+- 'no' (default) or 'yes'
+
 ##Quickstart API Guide
 
     >> import bitquant as bq
@@ -134,7 +137,7 @@ Ping exchange API for trade history data, insert data, and return DataFrame
 
 Convert trade history to OLHCV price history, insert data, and return DataFrame
 
-    >> top = bq.trades_to_price(exchange, symbol, freq, start=0)
+    >> top = bq.trades_to_price(exchange, symbol, freq, start=0, name='')
     >> price_history = top.to_sql()
 
 Upload trade history csv from [BitcoinCharts](http://api.bitcoincharts.com/v1/csv/) and return price history
@@ -169,6 +172,4 @@ Run cron class, `length` should be the number of seconds for the cron job interv
 
     >> c.run(length, log='no')
 
-**`to_sql`: insert returned data into MySQL database**
-- 'no' (default) or 'yes'
 
