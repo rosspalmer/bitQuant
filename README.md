@@ -74,6 +74,7 @@ The whole process took only 26 seconds.
 **`exchange`: exchange name (supported)**
 - `bitfinex`
 - `bitstamp`
+- `coinbase`
 - `btce`
 - `okcoin`
 - `btcchina`
@@ -133,7 +134,7 @@ Ping exchange API for trade history data, insert data, and return DataFrame
 
 Convert trade history to OLHCV price history, insert data, and return DataFrame
 
-    >> top = bq.trades_to_price(exchange, symbol, freq, start)
+    >> top = bq.trades_to_price(exchange, symbol, freq, start=0)
     >> price_history = top.to_sql()
 
 Upload trade history csv from [BitcoinCharts](http://api.bitcoincharts.com/v1/csv/) and return price history

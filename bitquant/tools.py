@@ -7,8 +7,8 @@ from datetime import datetime
 #|Convert trades data to price data
 def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 
-	price = trd['price']	
-	amount = trd['amount']
+	price = trd['price'].astype(float)	
+	amount = trd['amount'].astype(float)
 	priceamprod = price * amount	
 	prc = DataFrame(index=price.resample(freq, how='last').index)	
 	
@@ -73,10 +73,10 @@ def dateconv(date):
 #|column names and return DataFrame	
 def standard_columns(df):
 	cols = []	
-	headers = {'tid':'tid',
+	headers = {'tid':'tid','trade_id':'tid',
 		'price':'price',
-		'amount':'amount',
-		'type':'type',		
+		'amount':'amount','size':'amount',
+		'type':'type','side':'type',		
 		'timestamp':'timestamp','date':'timestamp',
 		'timestamp_ms':'timestamp_ms','date_ms':'timestamp_ms',
 		'exchange':'exchange'}

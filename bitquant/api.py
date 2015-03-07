@@ -2,8 +2,9 @@ import sql
 import tools
 
 import json
+import numpy as np
 from pandas.io.json import json_normalize
-from pandas import DataFrame
+from pandas import DataFrame, to_datetime
 from urllib import urlopen
 
 #|Request class for exchange API data
@@ -73,6 +74,9 @@ class request(object):
 		       'bitstamp':{'btcusd':{'url':'https://www.bitstamp.net/api',
 					     'trades':'transactions','quandl':'BCHARTS/BITSTAMPUSD',
 					     'bchart':'bitstampUSD'}},
+		       'coinbase':{'btcusd':{'url':'https://api.exchange.coinbase.com',
+					     'trades':'products/BTC-USD/trades','limit':'limit=',
+					     'since':'after='}},
 		       'btce':{'btcusd':{'url':'https://btc-e.com/api/3',
 					 'trades':'trades/btc_usd','limit':'limit=',
 					 'quandl':'BCHARTS/BTCEUSD','bchart':'btceUSD'},
@@ -97,6 +101,7 @@ class request(object):
 				 'ltccny':{'url':'https://www.okcoin.cn/api/v1',
 					   'trades':'trades.do','since':'since=',
 			    		   'market':'symbol=ltc_cny'}}}
+					    
 		return cmd
 
 #|Convert Quandl API response to DataFrame
@@ -114,6 +119,9 @@ def resp_trades(response, exchange):
 		for col in response:
 			response = response[col]
 	df = json_normalize(response)
+	if exchange == 'coinbase':
+		df['time'] = to_datetime(df['time'], utc=0)
+		df['timestamp'] = df['time'].astype(np.int64) // 10**9
 	return df
 
 
