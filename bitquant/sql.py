@@ -43,15 +43,11 @@ class dbconnect():
 
 	#|Insert DataFrame to SQL table using types
 	#|(i) INSERT OR INGORE (d) Delete and insert
-	def df_to_sql(self, df, table_name, typ):
-		tbl = self.add_tbl(table_name)		
-		data = df.to_dict('records')		
-		if typ == 'i':
-			stmt = self.sql_insert(tbl)
-		if typ == 'd':
-			stmt = tbl.delete()
-			stmt.execute()
-			stmt = self.sql_insert(tbl)
+	def df_to_sql(self, df, table_name):
+		tbl = self.add_tbl(table_name)
+		print df		
+		data = df.to_dict('records')
+		stmt = self.sql_insert(tbl)
 		stmt.execute(data)
 
 	#Customize insert or ignore command for different SQLs
@@ -121,9 +117,9 @@ class dbconnect():
 #|--------Shortcut SQL <--> DataFrame commands--------
 
 #|Insert (or Ignore) Dataframe into SQL database
-def df_to_sql(df, table_name, typ='i'):
+def df_to_sql(df, table_name):
 	db = dbconnect()
-	db.df_to_sql(df, table_name, typ)
+	db.df_to_sql(df, table_name)
 
 #|Return trades data from SQL as DataFrame
 def trades_df(exchange='', symbol='', start ='', end=''):		

@@ -112,4 +112,3 @@ class since_history(object):
 			print
 		self.i += 1
 
-

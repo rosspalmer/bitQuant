@@ -10,46 +10,22 @@ from urllib import urlopen
 #|Request class for exchange API data
 class request(object):
 
-	def __init__(self, exchange, symbol, limit='', since=''):
+	def __init__(self, exchange, symbol, limit='', since='', typ='trades'):
 		self.values = {'exchange':exchange, 'symbol':symbol,
-			       'limit':limit, 'since':since}		
+			       'limit':limit, 'since':since, 'typ':typ}		
 		self.cmd = self.commands()[exchange][symbol]
 		self.stmt = ''
-	
-	#|Build statement for API request
-	def build_stmt(self, typ):
-		self.stmt = ''		
-		if typ == 'trades':
-			self.stmt += self.cmd['url']
-			self.stmt += str('/') + self.cmd['trades']
-			if 'market' in self.cmd.keys():
-				self.values['market'] = ''
-				self.add_parameter('market')
-			if self.values['limit'] <> '' and 'limit' in self.cmd.keys():
-				self.add_parameter('limit')
-			if self.values['since'] <> '' and 'since' in self.cmd.keys():
-				self.add_parameter('since')
-		if typ == 'quandl' and 'quandl' in self.cmd.keys():
-			self.stmt += 'https://www.quandl.com/api/v1/datasets/%s.json'\
-					% self.cmd['quandl']
-
-	#|Add a parameter to the API request statement
-	def add_parameter(self, parameter):
-		if self.stmt.find('?') == -1:
-			self.stmt += str('?') + self.cmd[parameter] + str(self.values[parameter])
-		else:
-			self.stmt += str('&') + self.cmd[parameter] + str(self.values[parameter])
 
 	#|GET API request and return DataFrame
-	def get(self, typ='trades'):
+	def get(self):
 		if self.stmt == '':
-			self.build_stmt(typ)
+			self.build_stmt()
 		response = urlopen(self.stmt)
 		response = json.load(response)
-		if typ == 'quandl':
-			df = resp_quandl(response)
+		if self.values['typ'] == 'quandl':
+			df = self.df_quandl(response)
 		else: 
-			df = resp_trades(response, self.values['exchange'])
+			df = self.df_trades(response)
 		df = tools.standard_columns(df)
 		if 'exchange' not in df:
 			df['exchange'] = self.values['exchange']
@@ -59,9 +35,36 @@ class request(object):
 
 	#|Get data and insert into SQL database
 	def to_sql(self):
-		df = self.get('trades')
-		sql.df_to_sql(df, 'trades')
+		df = self.get()
+		if self.values['typ'] == 'trades':
+			sql.df_to_sql(df, 'trades')
+		else:
+			sql.df_to_sql(df, 'price')
 		return df
+	
+	#|Build statement for API request
+	def build_stmt(self):
+		self.stmt = ''		
+		if self.values['typ'] == 'trades':
+			self.stmt += self.cmd['url']
+			self.stmt += str('/') + self.cmd['trades']
+			if 'market' in self.cmd.keys():
+				self.values['market'] = ''
+				self.add_parameter('market')
+			if self.values['limit'] <> '' and 'limit' in self.cmd.keys():
+				self.add_parameter('limit')
+			if self.values['since'] <> '' and 'since' in self.cmd.keys():
+				self.add_parameter('since')
+		if self.values['typ'] == 'quandl' and 'quandl' in self.cmd.keys():
+			self.stmt += 'https://www.quandl.com/api/v1/datasets/%s.json'\
+					% self.cmd['quandl']
+
+	#|Add a parameter to the API request statement
+	def add_parameter(self, parameter):
+		if self.stmt.find('?') == -1:
+			self.stmt += str('?') + self.cmd[parameter] + str(self.values[parameter])
+		else:
+			self.stmt += str('&') + self.cmd[parameter] + str(self.values[parameter])
 		
 	#|Individual command dictionary for exchange/symbols
 	def commands(self):
@@ -104,24 +107,25 @@ class request(object):
 					    
 		return cmd
 
-#|Convert Quandl API response to DataFrame
-def resp_quandl(response):
-	data = response['data']
-	headers = response['column_names']
-	df = DataFrame(data, columns=headers)
-	df['timestamp'] = df['Date'].apply(tools.dateconv)
-	df = tools.date_index(df.drop('Date', axis=1))
-	return df
+	#|Convert Quandl API response to DataFrame
+	def df_quandl(self, response):
+		data = response['data']
+		headers = response['column_names']
+		df = DataFrame(data, columns=headers)
+		df['timestamp'] = df['Date'].apply(tools.dateconv)
+		df['freq'] = 'd'
+		df['source'] = 'quandl'
+		df = tools.date_index(df.drop('Date', axis=1))
+		return df
 
-#|Convert Exchange API response to DataFrame
-def resp_trades(response, exchange):
-	if exchange == 'btce':
-		for col in response:
-			response = response[col]
-	df = json_normalize(response)
-	if exchange == 'coinbase':
-		df['time'] = to_datetime(df['time'], utc=0)
-		df['timestamp'] = df['time'].astype(np.int64) // 10**9
-	return df
-
+	#|Convert Exchange API response to DataFrame
+	def df_trades(self, response):
+		if self.values['exchange'] == 'btce':
+			for col in response:
+				response = response[col]
+		df = json_normalize(response)
+		if self.values['exchange'] == 'coinbase':
+			df['time'] = to_datetime(df['time'], utc=0)
+			df['timestamp'] = df['time'].astype(np.int64) // 10**9
+		return df
 

@@ -79,7 +79,15 @@ def standard_columns(df):
 		'type':'type','side':'type',		
 		'timestamp':'timestamp','date':'timestamp',
 		'timestamp_ms':'timestamp_ms','date_ms':'timestamp_ms',
-		'exchange':'exchange'}
+		'exchange':'exchange',
+		'Open':'open',
+		'Low':'low',
+		'High':'high',
+		'Close':'close',
+		'Volume (BTC)':'volume',
+		'Weighted Price':'vwap',
+		'source':'source',
+		'freq':'freq'}
 	for col in df:
 		if col in headers.keys():
 			cols.append(headers[col])
