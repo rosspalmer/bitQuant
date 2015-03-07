@@ -2,6 +2,7 @@ import api
 import sql
 import tools
 
+import datetime
 from pandas import DataFrame
 
 #|Used to convert trade history in MySQL database to price (OLHCV) data
@@ -64,6 +65,7 @@ class since_history(object):
 		self.exchange = exchange
 		self.symbol = symbol
 		self.limit = limit
+		self.i = 0
 		if isinstance(start, str):			
 			start = tools.dateconv(start)
 		self.trd = self.build_trd(limit, start)
@@ -84,17 +86,30 @@ class since_history(object):
 			add, size = self.api_ping(since=since)
 			trd = trd.append(add)
 			since = int(trd.index.min()) - size
-			print trd
+			self.display(trd, start)
 		trd['timestamp'] = trd['timestamp'].astype(int)
 		trd = tools.date_index(trd)	
 		return trd
 
 	#|Ping exchange api and get trades dataframe
 	def api_ping(self, since=''):
-		ping = api.trades_api(self.exchange, self.symbol,
+		ping = api.request(self.exchange, self.symbol,
 			limit=self.limit, since=since)
-		trd = ping.get_data()
+		trd = ping.get()
 		trd = trd.set_index('tid')
 		size = len(trd.index)
 		return trd, size
+
+	#|Display last (earliest) timestamp every 10 rounds
+	def display(self, trd, start):
+		if self.i % 10 == 0:
+			last = datetime.datetime.fromtimestamp( \
+				int(trd['timestamp'].min())).strftime('%Y-%m-%d %H:%M:%S')
+			goal = datetime.datetime.fromtimestamp( \
+				start).strftime('%Y-%m-%d %H:%M:%S')
+			print 'Last Date: %s' % last			
+			print 'Goal Date: %s' % goal
+			print
+		self.i += 1
+
 
