@@ -29,7 +29,7 @@
       <div class="inner clearfix">
         <section id="main-content">
           <h1>
-<a id="bitquant-v027" class="anchor" href="#bitquant-v027" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.2.7</h1>
+<a id="bitquant-v028" class="anchor" href="#bitquant-v028" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.2.8</h1>
 
 <p>The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.</p>
 
@@ -127,6 +127,7 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 <ul>
 <li><code>bitfinex</code></li>
 <li><code>bitstamp</code></li>
+<li><code>coinbase</code></li>
 <li><code>btce</code></li>
 <li><code>okcoin</code></li>
 <li><code>btcchina</code></li>
@@ -206,6 +207,12 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 <li>Input integer</li>
 </ul>
 
+<p><strong><code>to_sql</code>: insert returned data into MySQL database</strong></p>
+
+<ul>
+<li>'no' (default) or 'yes'</li>
+</ul>
+
 <h2>
 <a id="quickstart-api-guide" class="anchor" href="#quickstart-api-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart API Guide</h2>
 
@@ -228,7 +235,7 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 
 <p>Convert trade history to OLHCV price history, insert data, and return DataFrame</p>
 
-<pre><code>&gt;&gt; top = bq.trades_to_price(exchange, symbol, freq, start)
+<pre><code>&gt;&gt; top = bq.trades_to_price(exchange, symbol, freq, start=0, name='')
 &gt;&gt; price_history = top.to_sql()
 </code></pre>
 
@@ -272,12 +279,6 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 
 <pre><code>&gt;&gt; c.run(length, log='no')
 </code></pre>
-
-<p><strong><code>to_sql</code>: insert returned data into MySQL database</strong></p>
-
-<ul>
-<li>'no' (default) or 'yes'</li>
-</ul>
         </section>
 
         <aside id="sidebar">
