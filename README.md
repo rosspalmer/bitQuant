@@ -37,7 +37,8 @@ Supported: sqlite MySQL
 ##Tutorials
 
 - **[Basics](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Basics)**
-- **[Data Maintenance](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Data-Maintenance)**
+- **[Build History from External Sources](https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Build-history-from-external-sources)**
+- **[API Data Maintenance](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Data-Maintenance)**
 
 ##Speed test
 
