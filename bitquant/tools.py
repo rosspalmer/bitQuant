@@ -10,16 +10,16 @@ def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 	price = trd['price'].astype(float)	
 	amount = trd['amount'].astype(float)
 	priceamprod = price * amount	
-	prc = DataFrame(index=price.resample(freq, how='last').index)	
+	prc = DataFrame(index=price.resample(freq, how='last', closed='right', label='right').index)	
 	
 	#|Use pandas 'resample' function to create OLHCV data
-	prc['open'] = price.resample(freq, how='first').fillna(value=0)
-	prc['low'] = price.resample(freq, how='min').fillna(value=0)
-	prc['high'] = price.resample(freq, how='max').fillna(value=0)
-	prc['close'] = price.resample(freq, how='last').fillna(method='ffill')
-	prc['volume'] = amount.resample(freq, how='sum').fillna(value=0)
+	prc['open'] = price.resample(freq, how='first', closed='right', label='right').fillna(value=0)
+	prc['low'] = price.resample(freq, how='min', closed='right', label='right').fillna(value=0)
+	prc['high'] = price.resample(freq, how='max', closed='right', label='right').fillna(value=0)
+	prc['close'] = price.resample(freq, how='last', closed='right', label='right').fillna(method='ffill')
+	prc['volume'] = amount.resample(freq, how='sum', closed='right', label='right').fillna(value=0)
 	# avoiding zeros in volume for VWAP
-	vwap = priceamprod.resample(freq, how='sum') / amount.resample(freq, how='sum')
+	vwap = priceamprod.resample(freq, how='sum', closed='right', label='right') / amount.resample(freq, how='sum', closed='right', label='right')
 	prc['vwap'] = vwap.fillna(value=0)
 	prc = prc.apply(replace_zero, axis=1)	
 
