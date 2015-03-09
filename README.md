@@ -23,7 +23,7 @@ The goal of bitQuant is to provide a complete package for gathering Bitcoin trad
 
 **(1) Install via PyPi**
 
-  `easy_install bitquant` or `pip install bitquant`
+  `easy_install bitquant`
 
 **(2) Configure SQL database**
 
