@@ -76,7 +76,10 @@ class cron(object):
 	def update_trades(self):
 		ping = api.request(self.job['exchange'], self.job['symbol'], 
 				limit=self.job['limit'], since=self.job['since'])
-		trd = ping.to_sql()
+		try:
+			trd = ping.to_sql()
+		except:
+			pass
 		self.schedule_trades()
 
 	#|Convert trade data to price history
