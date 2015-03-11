@@ -9,12 +9,14 @@ from pandas import DataFrame
 class trades_to_price(object):
 	
 	#|Set variables and convert trade data to price data
-	def __init__(self, exchange, symbol, freq, start=0, name=''):
+	def __init__(self, exchange, symbol, freq, start=0, name='', label='left'):
 		self.exchange = exchange
 		self.symbol = symbol
 		self.freq = freq
 		self.start = start
 		self.name = name
+		self.label = label
+
 		self.prc = self.convert()
 
 	#|Insert price data into SQL database
@@ -34,25 +36,27 @@ class trades_to_price(object):
 		else:
 			trd = sql.trades_df(exchange=self.exchange, symbol=self.symbol, 
 					start=self.start)
+		print trd
 
 		#|Run OLHCV conversion with appropriate 'exchange' label
 		if self.name <> '':
 			prc = tools.olhcv(trd, self.freq, tsmp_col='yes', 
-					exchange=self.name)
+					exchange=self.name,label=self.label)
 		elif self.exchange == 'all' or isinstance(self.exchange, list):
 			prc = tools.olhcv(trd, self.freq, tsmp_col='yes', 
 					exchange='multi')
 		else:
-			prc = tools.olhcv(trd, self.freq, tsmp_col='yes')
+			prc = tools.olhcv(trd, self.freq, tsmp_col='yes',
+					label=self.label)
 		prc['source'] = 'trades'
 		return prc
 
 #|Convert bitcoin charts trade csv to price history
-def bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
+def bchart_csv(exchange, symbol, freq, file_path, to_sql='no', label='left'):
 	trd = DataFrame.from_csv(file_path, header=None, index_col=None)
 	trd.columns = ['timestamp','price','amount']
 	trd = tools.date_index(trd)
-	prc = tools.olhcv(trd, freq, exchange, symbol, 'yes')
+	prc = tools.olhcv(trd, freq, exchange, symbol, 'yes', label=label)
 	prc['source'] = 'bchart'
 	if to_sql == 'yes':
 		sql.df_to_sql(prc, 'price')
@@ -61,10 +65,11 @@ def bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
 #|Use since API parameter to build trade history and convert to price history
 class since_history(object):
 
-	def __init__(self, exchange, symbol, limit='', start=0):
+	def __init__(self, exchange, symbol, limit='', start=0, label='left'):
 		self.exchange = exchange
 		self.symbol = symbol
 		self.limit = limit
+		self.label = label
 		self.i = 0
 		if isinstance(start, str):			
 			start = tools.dateconv(start)
@@ -72,7 +77,7 @@ class since_history(object):
 
 	#|Convert trade history into price history and insert into SQL if required
 	def prc(self, freq, to_sql='no'):
-		prc = tools.olhcv(self.trd, freq, tsmp_col='yes')
+		prc = tools.olhcv(self.trd, freq, tsmp_col='yes', label=self.label)
 		prc['source'] = 'trades'
 		if to_sql == 'yes':
 			sql.df_to_sql(prc, 'price')
@@ -89,7 +94,6 @@ class since_history(object):
 			self.display(trd, start)
 		trd['timestamp'] = trd['timestamp'].astype(int)
 		trd = tools.date_index(trd)	
-		return trd
 
 	#|Ping exchange api and get trades dataframe
 	def api_ping(self, since=''):
