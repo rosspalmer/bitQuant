@@ -5,21 +5,21 @@ from time import mktime
 from datetime import datetime
 
 #|Convert trades data to price data
-def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
+def olhcv(trd, freq, exchange='', symbol='', label='left', tsmp_col='no'):
 
 	price = trd['price'].astype(float)	
 	amount = trd['amount'].astype(float)
 	priceamprod = price * amount	
-	prc = DataFrame(index=price.resample(freq, how='last', closed='right', label='right').index)	
+	prc = DataFrame(index=price.resample(freq, how='last', closed='right', label=label).index)	
 	
 	#|Use pandas 'resample' function to create OLHCV data
-	prc['open'] = price.resample(freq, how='first', closed='right', label='right').fillna(value=0)
-	prc['low'] = price.resample(freq, how='min', closed='right', label='right').fillna(value=0)
-	prc['high'] = price.resample(freq, how='max', closed='right', label='right').fillna(value=0)
-	prc['close'] = price.resample(freq, how='last', closed='right', label='right').fillna(method='ffill')
-	prc['volume'] = amount.resample(freq, how='sum', closed='right', label='right').fillna(value=0)
+	prc['open'] = price.resample(freq, how='first', closed='right', label=label).fillna(value=0)
+	prc['low'] = price.resample(freq, how='min', closed='right', label=label).fillna(value=0)
+	prc['high'] = price.resample(freq, how='max', closed='right', label=label).fillna(value=0)
+	prc['close'] = price.resample(freq, how='last', closed='right', label=label).fillna(method='ffill')
+	prc['volume'] = amount.resample(freq, how='sum', closed='right', label=label).fillna(value=0)
 	# avoiding zeros in volume for VWAP
-	vwap = priceamprod.resample(freq, how='sum', closed='right', label='right') / amount.resample(freq, how='sum', closed='right', label='right')
+	vwap = priceamprod.resample(freq, how='sum', closed='right', label=label) / amount.resample(freq, how='sum', closed='right', label=label)
 	prc['vwap'] = vwap.fillna(value=0)
 	prc = prc.apply(replace_zero, axis=1)	
 
@@ -39,7 +39,7 @@ def olhcv(trd, freq, exchange='', symbol='', tsmp_col='no'):
 		prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 
 	#|Slice price data to cut off incomplete ends
-	prc = prc[1:-1]
+	#prc = prc[1:-1]
 	return prc
 
 #|Replace zeros in open, low, and high with the last close
