@@ -39,7 +39,7 @@ def olhcv(trd, freq, exchange='', symbol='', label='left', tsmp_col='no'):
 		prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 
 	#|Slice price data to cut off incomplete ends
-	#prc = prc[1:-1]
+	prc = prc[1:-1]
 	return prc
 
 #|Replace zeros in open, low, and high with the last close
