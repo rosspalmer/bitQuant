@@ -1,4 +1,4 @@
-# bitQuant v0.2.8
+# bitQuant v0.2.9
 
 The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.
 
@@ -36,9 +36,9 @@ Supported: sqlite MySQL
 
 ##Tutorials
 
-- **[Basics](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Basics)**
+- **[Basics](https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Basics)**
 - **[Build History from External Sources](https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Build-history-from-external-sources)**
-- **[API Data Maintenance](https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Data-Maintenance)**
+- **[API Data Maintenance](https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-API-Data-Maintenance)**
 
 ##Speed test
 
@@ -96,13 +96,6 @@ The whole process took only 26 seconds.
 **`source`: source of trade data for price history**
 - `trades`: price data converted from MySQL trade history
 - `bchart`: price data converted from BitcoinChart csv file
-
-**`job`: job type for cron class**
-- `trades`: Ping API for trade data and add to MySQL (hard_time required)
-- `price`: Convert trade data to price data adn add to MySQL (freq required)
-
-**`hard_time`: time between instances of a job**
-- Input integer in seconds
 
 **`start`: start point of data set**
 - Input `m/d/yy` for start date
@@ -165,12 +158,17 @@ Create `cron` class
 
     >> c = bq.cron()
 
-Add `job` for cron class (may add multiple jobs)
+`cron` class runs through a list of various jobs
+- **trades job**: Ping API for trade data and add to MySQL
+- **price job**: Convert trade data to price data and add to MySQL
 
-    >> c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):
+Add **trade jobs** and **price jobs** to cron class (may add multiple jobs)
 
-Run cron class, `length` should be the number of seconds for the cron job interval
+    >> c.add_tjob(exchange, symbol, limit='')
+    >> c.add_pjob(exchange, symbol, freq)
 
-    >> c.run(length, log='no')
+Run cron class, `time` should be the number of seconds for the cron job interval
+
+    >> c.run(time, mode='order', log='no')
 
 
