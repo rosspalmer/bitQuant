@@ -32,7 +32,7 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a id="bitquant-v028" class="anchor" href="#bitquant-v028" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.2.8</h1>
+<a id="bitquant-v029" class="anchor" href="#bitquant-v029" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.2.9</h1>
 
 <p>The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.</p>
 
@@ -86,9 +86,9 @@
 <a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
 
 <ul>
-<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Basics">Basics</a></strong></li>
+<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Basics">Basics</a></strong></li>
 <li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Build-history-from-external-sources">Build History from External Sources</a></strong></li>
-<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial---Data-Maintenance">API Data Maintenance</a></strong></li>
+<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-API-Data-Maintenance">API Data Maintenance</a></strong></li>
 </ul>
 
 <h2>
@@ -168,21 +168,6 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 <code>trades</code>: price data converted from MySQL trade history</li>
 <li>
 <code>bchart</code>: price data converted from BitcoinChart csv file</li>
-</ul>
-
-<p><strong><code>job</code>: job type for cron class</strong></p>
-
-<ul>
-<li>
-<code>trades</code>: Ping API for trade data and add to MySQL (hard_time required)</li>
-<li>
-<code>price</code>: Convert trade data to price data adn add to MySQL (freq required)</li>
-</ul>
-
-<p><strong><code>hard_time</code>: time between instances of a job</strong></p>
-
-<ul>
-<li>Input integer in seconds</li>
 </ul>
 
 <p><strong><code>start</code>: start point of data set</strong></p>
@@ -274,14 +259,24 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
 <pre><code>&gt;&gt; c = bq.cron()
 </code></pre>
 
-<p>Add <code>job</code> for cron class (may add multiple jobs)</p>
+<p><code>cron</code> class runs through a list of various jobs</p>
 
-<pre><code>&gt;&gt; c.add_job(self, exchange, symbol, job, limit='', since='', freq='', hard_time=''):
+<ul>
+<li>
+<strong>trades job</strong>: Ping API for trade data and add to MySQL</li>
+<li>
+<strong>price job</strong>: Convert trade data to price data and add to MySQL</li>
+</ul>
+
+<p>Add <strong>trade jobs</strong> and <strong>price jobs</strong> to cron class (may add multiple jobs)</p>
+
+<pre><code>&gt;&gt; c.add_tjob(exchange, symbol, limit='')
+&gt;&gt; c.add_pjob(exchange, symbol, freq)
 </code></pre>
 
-<p>Run cron class, <code>length</code> should be the number of seconds for the cron job interval</p>
+<p>Run cron class, <code>time</code> should be the number of seconds for the cron job interval</p>
 
-<pre><code>&gt;&gt; c.run(length, log='no')
+<pre><code>&gt;&gt; c.run(time, mode='order', log='no')
 </code></pre>
       </section>
     </div>
@@ -290,7 +285,7 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <p class="copyright">bitQuant maintained by <a href="https://github.com/rosspalmer">rosspalmer</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
 
