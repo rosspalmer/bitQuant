@@ -9,11 +9,13 @@ from pandas import DataFrame
 class trades_to_price(object):
 	
 	#|Set variables and convert trade data to price data
-	def __init__(self, exchange, symbol, freq, start=0, name='', label='left'):
+	def __init__(self, exchange, symbol, freq, start=0, 
+			mode='none', name='', label='left'):
 		self.exchange = exchange
 		self.symbol = symbol
 		self.freq = freq
 		self.start = start
+		self.mode = mode
 		self.name = name
 		self.label = label
 
@@ -36,17 +38,16 @@ class trades_to_price(object):
 		else:
 			trd = sql.trades_df(exchange=self.exchange, symbol=self.symbol, 
 					start=self.start)
-		print trd
 
 		#|Run OLHCV conversion with appropriate 'exchange' label
 		if self.name <> '':
-			prc = tools.olhcv(trd, self.freq, tsmp_col='yes', 
-					exchange=self.name,label=self.label)
+			prc = tools.olhcv(trd, self.freq, mode=self.mode, tsmp_col='yes', 
+					exchange=self.name, label=self.label)
 		elif self.exchange == 'all' or isinstance(self.exchange, list):
-			prc = tools.olhcv(trd, self.freq, tsmp_col='yes', 
+			prc = tools.olhcv(trd, self.freq, mode=self.mode, tsmp_col='yes', 
 					exchange='multi')
 		else:
-			prc = tools.olhcv(trd, self.freq, tsmp_col='yes',
+			prc = tools.olhcv(trd, self.freq, mode=self.mode, tsmp_col='yes',
 					label=self.label)
 		prc['source'] = 'trades'
 		return prc
