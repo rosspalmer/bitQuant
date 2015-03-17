@@ -44,8 +44,7 @@ class dbconnect():
 	#|Insert DataFrame to SQL table using types
 	#|(i) INSERT OR INGORE (d) Delete and insert
 	def df_to_sql(self, df, table_name):
-		tbl = self.add_tbl(table_name)
-		print df		
+		tbl = self.add_tbl(table_name)		
 		data = df.to_dict('records')
 		stmt = self.sql_insert(tbl)
 		stmt.execute(data)
@@ -129,9 +128,9 @@ def trades_df(exchange='', symbol='', start ='', end=''):
 	return df
 
 #|Return price history from SQL using exchange/source filters as DataFrame
-def price_df(exchange='', freq='', source='',start=''):
+def price_df(exchange='', symbol='', freq='', source='',start=''):
 	db = dbconnect()
-	df = db.sql_to_df('price', exchange=exchange, freq=freq,
-			source=source, start=start)
+	df = db.sql_to_df('price', exchange=exchange, symbol=symbol,
+			freq=freq, source=source, start=start)
 	return df
 	

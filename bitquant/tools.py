@@ -1,11 +1,13 @@
 import numpy as np
+from fractions import gcd
 from pandas import DataFrame
 from pandas.tseries.tools import to_datetime
 from time import mktime
 from datetime import datetime
 
 #|Convert trades data to price data
-def olhcv(trd, freq, exchange='', symbol='', label='left', tsmp_col='no'):
+def olhcv(trd, freq, exchange='', symbol='', mode='none', 
+		label='left', tsmp_col='no'):
 
 	price = trd['price'].astype(float)	
 	amount = trd['amount'].astype(float)
@@ -38,9 +40,14 @@ def olhcv(trd, freq, exchange='', symbol='', label='left', tsmp_col='no'):
 	if tsmp_col == 'yes':
 		prc['timestamp'] = prc.index.astype(np.int64) // 10**9
 
+	#|Add period column with the second amount of freq
+	if mode == 'period' and len(prc.index) >= 2:	
+		prc['period'] = abs(prc['timestamp'].iloc[1]-prc['timestamp'].iloc[0])
+
 	#|Slice price data to cut off incomplete ends
 	prc = prc[1:-1]
 	return prc
+	
 
 #|Replace zeros in open, low, and high with the last close
 def replace_zero(row):
