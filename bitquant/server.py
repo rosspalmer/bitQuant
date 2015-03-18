@@ -33,12 +33,14 @@ class cron(object):
 	def run(self, time, mode='order', log='no'):
 		end = tm.time() + time
 		i = 1
+		l = api.limiter()
 		while tm.time() < end:
 			for job in self.tjob:
 				if i % job['ratio'] == 0:
 					if log == 'yes':
-						print job				
-					job = self.tjob_run(job)		
+						print job
+					l.limit()					
+					job = self.tjob_run(job)	
 			if mode == 'ratio':			
 				self.tjob_ratio()
 			if len(self.pjob) > 0:
