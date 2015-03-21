@@ -3,6 +3,7 @@ import tools
 
 import json
 import numpy as np
+import time as tm
 from pandas.io.json import json_normalize
 from pandas import DataFrame, to_datetime
 from urllib import urlopen
@@ -79,12 +80,12 @@ class request(object):
 					     'bchart':'bitstampUSD'}},
 		       'coinbase':{'btcusd':{'url':'https://api.exchange.coinbase.com',
 					     'trades':'products/BTC-USD/trades','limit':'limit=',
-					     'since':'after='}},
+					     'since':'after=','max':100}},
 		       'btce':{'btcusd':{'url':'https://btc-e.com/api/3',
 					 'trades':'trades/btc_usd','limit':'limit=',
-					 'quandl':'BCHARTS/BTCEUSD','bchart':'btceUSD'},
+					 'quandl':'BCHARTS/BTCEUSD','bchart':'btceUSD','max':2000},
 			       'ltcusd':{'url':'https://btc-e.com/api/3',
-					 'trades':'trades/ltc_usd','limit':'limit='}},
+					 'trades':'trades/ltc_usd','limit':'limit=','max':2000}},
 		       'btcchina':{'btccny':{'url':'https://data.btcchina.com',
 					     'trades':'data/historydata','limit':'limit=',
 					     'since':'since=','market':'market=btccny',
@@ -128,4 +129,15 @@ class request(object):
 			df['time'] = to_datetime(df['time'], utc=0)
 			df['timestamp'] = df['time'].astype(np.int64) // 10**9
 		return df
+
+#|Limit API pings to a specific 'requests per minute' (rpm)
+class limiter(object):
+	
+	def __init__(self):
+		self.last = tm.time()
+
+	def limit(self, rpm=60):
+		if (tm.time() - self.last) < (60.0/rpm):
+			tm.sleep(abs((60.0/rpm)-(tm.time()-self.last)))
+			self.last = tm.time()
 
