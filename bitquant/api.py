@@ -72,6 +72,7 @@ class request(object):
 
 		cmd = {'bitfinex':{'btcusd':{'url':'https://api.bitfinex.com/v1',
 			   		     'trades':'trades/btcusd','limit':'limit_trades=',
+			   		     'since':'timestamp=',
 					     'quandl':'BCHARTS/BITFINEXUSD','bchart':'bitfinexUSD'},
 				   'ltcusd':{'url':'https://api.bitfinex.com/v1',
 					     'trades':'trades/ltcusd','limit':'limit_trades='}},
