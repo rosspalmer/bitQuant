@@ -21,7 +21,7 @@ class request(object):
 	def get(self):
 		if self.stmt == '':
 			self.build_stmt()
-		response = urlopen(self.stmt)
+		response = urlopen(self.stmt)	
 		response = json.load(response)
 		if self.values['typ'] == 'quandl':
 			df = self.df_quandl(response)
@@ -35,12 +35,14 @@ class request(object):
 		return df
 
 	#|Get data and insert into SQL database
-	def to_sql(self):
+	def to_sql(self, stype='no'):
 		df = self.get()
 		if self.values['typ'] == 'trades':
 			sql.df_to_sql(df, 'trades')
 		else:
 			sql.df_to_sql(df, 'price')
+		if stype == 'yes' and 'stype' in self.cmd.keys():
+			df['stype'] = self.cmd['stype']
 		return df
 	
 	#|Build statement for API request
@@ -72,16 +74,17 @@ class request(object):
 
 		cmd = {'bitfinex':{'btcusd':{'url':'https://api.bitfinex.com/v1',
 			   		     'trades':'trades/btcusd','limit':'limit_trades=',
-			   		     'since':'timestamp=',
-					     'quandl':'BCHARTS/BITFINEXUSD','bchart':'bitfinexUSD'},
+			   		     'since':'timestamp=', 'stype':'timestamp',
+					     'quandl':'BCHARTS/BITFINEXUSD', 'bchart':'bitfinexUSD'},
 				   'ltcusd':{'url':'https://api.bitfinex.com/v1',
-					     'trades':'trades/ltcusd','limit':'limit_trades='}},
+					     'trades':'trades/ltcusd','limit':'limit_trades=',
+					     'since':'timestamp=', 'stype':'timestamp'}},
 		       'bitstamp':{'btcusd':{'url':'https://www.bitstamp.net/api',
-					     'trades':'transactions','quandl':'BCHARTS/BITSTAMPUSD',
-					     'bchart':'bitstampUSD'}},
+					     'trades':'transactions','limit':'limit=',
+					     'quandl':'BCHARTS/BITSTAMPUSD', 'bchart':'bitstampUSD'}},
 		       'coinbase':{'btcusd':{'url':'https://api.exchange.coinbase.com',
 					     'trades':'products/BTC-USD/trades','limit':'limit=',
-					     'since':'after=','max':100}},
+					     'since':'before=', 'stype':'id','max':100}},
 		       'btce':{'btcusd':{'url':'https://btc-e.com/api/3',
 					 'trades':'trades/btc_usd','limit':'limit=',
 					 'quandl':'BCHARTS/BTCEUSD','bchart':'btceUSD','max':2000},
@@ -89,23 +92,24 @@ class request(object):
 					 'trades':'trades/ltc_usd','limit':'limit=','max':2000}},
 		       'btcchina':{'btccny':{'url':'https://data.btcchina.com',
 					     'trades':'data/historydata','limit':'limit=',
-					     'since':'since=','market':'market=btccny',
-					     'bchart':'btcnCNY'},
+					     'since':'since=', 'stype':'id',
+					     'market':'market=btccny'},
 				   'ltccny':{'url':'https://data.btcchina.com',
 					     'trades':'data/historydata','limit':'limit=',
-					     'since':'since=','market':'market=ltccny'}},
+					     'since':'since=', 'stype':'id',
+					     'market':'market=ltccny'}},
 		       'okcoin':{'btcusd':{'url':'https://www.okcoin.com/api/v1',
 					   'trades':'trades.do','since':'since=',
-			    		   'market':'symbol=btc_usd'},
+			    		   'stype':'id', 'market':'symbol=btc_usd'},
 				 'ltcusd':{'url':'https://www.okcoin.com/api/v1',
 					   'trades':'trades.do','since':'since=',
-			    		   'market':'symbol=ltc_usd'},
+			    		   'stype':'id', 'market':'symbol=ltc_usd'},
 				 'btccny':{'url':'https://www.okcoin.cn/api/v1',
 					   'trades':'trades.do','since':'since=',
-			    		   'market':'symbol=btc_cny'},
+			    		   'stype':'id', 'market':'symbol=btc_cny'},
 				 'ltccny':{'url':'https://www.okcoin.cn/api/v1',
 					   'trades':'trades.do','since':'since=',
-			    		   'market':'symbol=ltc_cny'}}}
+			    		   'stype':'id', 'market':'symbol=ltc_cny'}}}
 					    
 		return cmd
 
