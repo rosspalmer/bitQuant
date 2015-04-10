@@ -21,7 +21,7 @@ class request(object):
 	def get(self):
 		if self.stmt == '':
 			self.build_stmt()
-		response = urlopen(self.stmt)	
+		response = urlopen(self.stmt)
 		response = json.load(response)
 		if self.values['typ'] == 'quandl':
 			df = self.df_quandl(response)
@@ -31,7 +31,7 @@ class request(object):
 		if 'exchange' not in df:
 			df['exchange'] = self.values['exchange']
 		if 'symbol' not in df:
-			df['symbol'] = self.values['symbol']
+			df['symbol'] = self.values['symbol']		
 		return df
 
 	#|Get data and insert into SQL database
