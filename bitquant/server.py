@@ -2,6 +2,7 @@ import api
 import data
 import tools
 
+import sys
 import pandas as pd
 import time as tm
 
@@ -18,7 +19,7 @@ class cron(object):
 	#|Add a trade job to 'tjob' list
 	def add_tjob(self, exchange, symbol, limit=''): 
 		job = {'exchange':exchange,'symbol':symbol,'limit':limit,
-			'ratio':1}
+			'since':0,'ratio':1}
 		self.tjob.append(job)
 
 	#|Add price job to 'pjob' list
@@ -66,17 +67,29 @@ class cron(object):
 
 	#|Ping API for trade data and add to SQL database
 	#|Optional setting to return trade velocity in trades per hour
-	def tjob_run(self, job):	
-		ping = api.request(job['exchange'], job['symbol'], limit=job['limit'])
-		try:
-			trd = ping.to_sql()
+	def tjob_run(self, job):
+		if job['since'] == 0:
+			ping = api.request(job['exchange'], job['symbol'],limit=job['limit'])
+		else: 	
+			ping = api.request(job['exchange'], job['symbol'], 
+					limit=job['limit'], since=job['since'])
+		try:		
+			trd = ping.to_sql(stype='yes')
+		except KeyboardInterrupt:
+			sys.exit("Program Stopped: Keyboard Interrupt")	
 		except:
-			print 'Error: Did not connect to exchange API'
+			pass
+		else:
+			if 'stype' in trd:
+				if trd['stype'][0]== 'id':
+					job['since'] = int(trd['tid'].max())
+				elif trd['stype'][0] == 'timestamp':
+					job['since'] = int(trd['timestamp'].max()) - 1
+			num = float(len(trd.index))
+			time = float(int(trd['timestamp'].max())-int(trd['timestamp'].min()))
+			if time > 0:		
+				job['vel'] = int(round((num/time)*3600))
 			return job
-		num = float(len(trd.index))
-		time = float(int(trd['timestamp'].max())-int(trd['timestamp'].min()))
-		job['vel'] = int(round((num/time)*3600))
-		return job
 
 	#|------Price job functions--------
 
@@ -104,4 +117,4 @@ class cron(object):
 				if log == 'yes':
 						print job
 				job = self.pjob_run(job)
-					
+				
