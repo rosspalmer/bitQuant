@@ -1,18 +1,18 @@
 try:
-	from setuptools import setup
+    from setuptools import setup
 except ImportError:
-	from distutils.core import setup
+    from distutils.core import setup
 
 config = {
-	'description':'End to end solution for bitcoin data gathering, backtesting, and live trading',
-	'author': 'ross palmer',
-	'url':'http://rosspalmer.github.io/bitQuant/',
-	'license':'MIT',
-	'version': '0.2.10',
-	'install_requires': ['SQLAlchemy','pandas','numpy','scipy','PyMySQL'],
-	'packages': ['bitquant'],
-	'scripts': [],
-	'name':'bitquant'
+    'description':'Bitcoin trade and exchange data miner',
+    'author': 'ross palmer',
+    'url':'http://rosspalmer.github.io/bitQuant/',
+    'license':'MIT',
+    'version': '0.3.0',
+    'install_requires': ['SQLAlchemy','pandas','numpy','scipy','PyMySQL'],
+    'packages': ['bitquant'],
+    'scripts': [],
+    'name':'bitquant'
 }
 
 setup(**config)
