@@ -1,5 +1,4 @@
 import stmt
-import tables
 from ..data.tools import date_index
 
 from pandas import DataFrame

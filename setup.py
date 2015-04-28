@@ -1,16 +1,16 @@
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, find_packages
 
 config = {
     'description':'Bitcoin trade and exchange data miner',
     'author': 'ross palmer',
     'url':'http://rosspalmer.github.io/bitQuant/',
     'license':'MIT',
-    'version': '0.3.0',
-    'install_requires': ['SQLAlchemy','pandas','numpy','scipy','PyMySQL'],
-    'packages': ['bitquant'],
+    'version': '0.3.1',
+    'install_requires': ['SQLAlchemy','pandas','numpy','PyMySQL'],
+    'packages': find_packages(),
     'scripts': [],
     'name':'bitquant'
 }

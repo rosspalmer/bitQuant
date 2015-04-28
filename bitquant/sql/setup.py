@@ -1,5 +1,4 @@
 import clss
-import tables
 
 def setup_sql():
     menu()
