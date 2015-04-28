@@ -1,295 +1,156 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="bitQuant : End to end solution for bitcoin data gathering, backtesting, and live trading">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>bitQuant</title>
+    <meta charset="UTF-8">
+    <title>bitQuant by rosspalmer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">bitQuant</h1>
+      <h2 class="project-tagline">Solution for extracting and organizing Bitcoin trade data</h2>
+      <a href="https://github.com/rosspalmer/bitQuant" class="btn">View on GitHub</a>
+      <a href="https://github.com/rosspalmer/bitQuant/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/rosspalmer/bitQuant/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/rosspalmer/bitQuant">View on GitHub</a>
+    <section class="main-content">
+      <h1>
+<a id="bitquant-v031" class="anchor" href="#bitquant-v031" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.3.1</h1>
 
-          <h1 id="project_title">bitQuant</h1>
-          <h2 id="project_tagline">End to end solution for bitcoin data gathering, backtesting, and live trading</h2>
+<p>bitQuant is a lightweight tool for extracting and organizing Bitcoin trade data provided by exchange APIs. bitQuant is designed to standardize data from many supported exchanges and store data in either temporary <strong>pandas</strong> DataFrames or permanent <strong>SQL</strong> tables. bitQuant performs all actions using three class objects which are efficent and easy to use and are ideal for data needs of both the hobbyist and professional.</p>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/rosspalmer/bitQuant/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/rosspalmer/bitQuant/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a id="bitquant-v029" class="anchor" href="#bitquant-v029" aria-hidden="true"><span class="octicon octicon-link"></span></a>bitQuant v0.2.9</h1>
-
-<p>The goal of bitQuant is to provide a complete package for gathering Bitcoin trade data, backtesting trade algorithms, and implementing those algorithms live. bitQuant is designed to be as efficient as possible to suite the needs of both the hobbist and the professional, and is compatible with multiple Bitcoin exchanges.</p>
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
 
 <h3>
-<a id="data" class="anchor" href="#data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data</h3>
+<a id="api-class" class="anchor" href="#api-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>API Class</h3>
 
 <ul>
-<li>"Ping" exchange APIs for trade history data</li>
-<li>Convert trade history to OLHCV price history at any frequency</li>
-<li>Store trade or price history data from in SQL server</li>
-<li>Automatically maintain and update SQL data</li>
-<li>Quandl API access for EOD data</li>
-<li>BitcoinCharts csv file support</li>
+<li>Request trade data from exchange REST API</li>
+<li>Return trade data as DataFrame</li>
+<li>Automatically limit rate on <strong>ALL</strong> requests</li>
+<li>Use <code>auto_since</code> feature to automatically minimize size of data requests (<em>currently broken</em>)</li>
 </ul>
 
 <h3>
-<a id="backtest-in-development" class="anchor" href="#backtest-in-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Backtest (in development)</h3>
+<a id="sql-class" class="anchor" href="#sql-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>SQL Class</h3>
 
 <ul>
-<li>Backtest trading algorithms against collected data</li>
-<li>Event driven backtester</li>
-<li>Easy intergration of indicators and strategies</li>
+<li>Automatically create SQL tables for trade and price data</li>
+<li>
+<strong>Insert</strong> or <strong>select</strong> data from SQL database using single command</li>
 </ul>
 
 <h3>
-<a id="live-in-planning" class="anchor" href="#live-in-planning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Live (in planning)</h3>
+<a id="data-class" class="anchor" href="#data-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data Class</h3>
 
 <ul>
-<li>Run trading algorithms live for multiple exchanges</li>
-<li>Compatiable with backtest algorithms</li>
+<li>Combines API and SQL classes for easily extract and process data</li>
+<li>Convert trade history data to OLHCV price data</li>
+<li>Embedded DataFrames store duplicate-free trade and price data</li>
+<li>Use <code>run_loop</code> function to continuously perform trade data requests on multiple exchanges</li>
+</ul>
+
+<h3>
+<a id="supported-exchanges" class="anchor" href="#supported-exchanges" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supported Exchanges</h3>
+
+<ul>
+<li>bitfinex</li>
+<li>bitstamp</li>
+<li>coinbase</li>
+<li>btce</li>
+<li>okcoin</li>
+<li>btcchina</li>
+</ul>
+
+<h3>
+<a id="supported-sql-types" class="anchor" href="#supported-sql-types" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supported SQL Types</h3>
+
+<ul>
+<li>sqlite</li>
+<li>MySQL</li>
 </ul>
 
 <h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+<a id="planned-features" class="anchor" href="#planned-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Planned Features</h2>
 
-<p><strong>(1) Install via PyPi</strong></p>
+<ul>
+<li>Expand API data requests to support ticker, orderbook, and lendbook data</li>
+<li>Add data remediation feature to fill in trade history holes using <code>since</code> API parameter</li>
+<li>Portfilo related API POST requests to perform trades, post orders, and access account information</li>
+<li>WebSocket API support to live steam data</li>
+<li>Support for OKCoin futures markets</li>
+</ul>
 
-<p><code>easy_install bitquant</code></p>
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a><a href="https://github.com/rosspalmer/bitQuant/wiki">Documentation</a>
+</h2>
 
-<p><strong>(2) Configure SQL database</strong></p>
+<h2>
+<a id="installation-and-setup-guide" class="anchor" href="#installation-and-setup-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation and Setup Guide</h2>
 
-<p>Run SQL access setup and create SQL tables</p>
+<p>Install bitQuant using source distribution from GitHub.</p>
 
-<p>Supported: sqlite MySQL</p>
+<pre><code>git clone https://github.com/rosspalmer/bitQuant.git
+cd bitQuant
+python setup.py install
+</code></pre>
+
+<p>Navigate to the folder location in which you would like to keep your <strong>login text file</strong> and <strong>sqlite</strong> database (if applicable). You will need to navigate to this location to access the <strong>login text file</strong> in the future.</p>
+
+<p>Run <code>setup_sql</code> command to setup up SQL database and tables.</p>
 
 <pre><code>&gt;&gt; import bitquant as bq
-&gt;&gt; bq.sql.setup()
+&gt;&gt; bq.setup_sql()
+
+-----SQL Database setup-----
+
+=Select SQL type=
+  (1) sqlite
+  (2) MySQL
 </code></pre>
+
+<p>Select the SQL type and input the relevant login information.</p>
 
 <h2>
-<a id="tutorials" class="anchor" href="#tutorials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tutorials</h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
-<ul>
-<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Basics">Basics</a></strong></li>
-<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-Build-history-from-external-sources">Build History from External Sources</a></strong></li>
-<li><strong><a href="https://github.com/rosspalmer/bitQuant/wiki/Tutorial:-API-Data-Maintenance">API Data Maintenance</a></strong></li>
-</ul>
+<p>The MIT License (MIT)</p>
 
-<h2>
-<a id="speed-test" class="anchor" href="#speed-test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Speed test</h2>
+<p>Copyright (c) 2014-2015 Ross Palmer</p>
 
-<p>Most data interactions are instantaneous but I wanted to test the module with a very large dataset.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
 
-<p>The <code>bchart_csv</code> function will upload a 800MB <a href="http://api.bitcoincharts.com/v1/csv/">csv file</a> from BitcoinCharts which contains the complete BTCChina trades history of over 18 million trades (ie. rows).</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
 
-<p>The data is then converted to OLHCV price history with a 30 min period.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
 
-<p>Finally, the price history is inserted into a low-budget remote low-budget MySQL server ~1,000 miles away.</p>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/rosspalmer/bitQuant">bitQuant</a> is maintained by <a href="https://github.com/rosspalmer">rosspalmer</a>.</span>
 
-<p>The whole process took only 26 seconds.</p>
-
-<pre><code>**Total time: 25.9832 s**
-File: data.py
-Function: bchart_csv at line 32
-
-Line #      Hits         Time  Per Hit   % Time  Line Contents
-==============================================================
-    32                                           @profile
-    33                                           def bchart_csv(exchange, symbol, freq, file_path,
-    34         1      6.80763 6807633.0     26.2    trd = DataFrame.from_csv(file_path, header=None,
-    35         1           49     49.0      0.0     print len(trd.index)
-    36         1          129    129.0      0.0     trd.columns = ['timestamp','price','amount']
-    37         1      2.03429 2034294.0     7.8     trd = tools.date_index(trd)
-    38         1      7.09359 7093593.0     27.3    prc = tools.olhcv(trd, freq, exchange, symbol, 'yes')
-    39         1         3316   3316.0      0.0     prc['source'] = 'bchart'
-    40         1            1      1.0      0.0     if to_sql == 'yes':
-    41         1     10.04414 10044148.0    38.7        sql.df_to_sql(prc, 'price')
-    42         1            3      3.0      0.0     return prc
-</code></pre>
-
-<h2>
-<a id="variables" class="anchor" href="#variables" aria-hidden="true"><span class="octicon octicon-link"></span></a>Variables</h2>
-
-<p><strong><code>exchange</code>: exchange name (supported)</strong></p>
-
-<ul>
-<li><code>bitfinex</code></li>
-<li><code>bitstamp</code></li>
-<li><code>coinbase</code></li>
-<li><code>btce</code></li>
-<li><code>okcoin</code></li>
-<li><code>btcchina</code></li>
-</ul>
-
-<p><strong><code>symbol</code>: symbol name (supported)</strong></p>
-
-<ul>
-<li><code>btcusd</code></li>
-<li><code>ltcusd</code></li>
-<li><code>btccny</code></li>
-<li><code>ltccny</code></li>
-</ul>
-
-<p><strong><code>freq</code>: frequency of OLHCV price data</strong></p>
-
-<ul>
-<li>
-<code>min</code>: minute</li>
-<li>
-<code>xmin</code>: x minute (for integer x)</li>
-<li>
-<code>h</code>: hour</li>
-<li>
-<code>d</code>: day</li>
-<li>
-<code>m</code>: month</li>
-</ul>
-
-<p><strong><code>source</code>: source of trade data for price history</strong></p>
-
-<ul>
-<li>
-<code>trades</code>: price data converted from MySQL trade history</li>
-<li>
-<code>bchart</code>: price data converted from BitcoinChart csv file</li>
-</ul>
-
-<p><strong><code>start</code>: start point of data set</strong></p>
-
-<ul>
-<li>Input <code>m/d/yy</code> for start date</li>
-<li>or input UNIX timestamp</li>
-</ul>
-
-<p><strong><code>end</code>: end point of data set</strong></p>
-
-<ul>
-<li>Input <code>m/d/yy</code> for end date</li>
-<li>or input UNIX timestamp</li>
-</ul>
-
-<p><strong><code>limit</code>: limit number of API response rows</strong></p>
-
-<ul>
-<li>Input integer</li>
-</ul>
-
-<p><strong><code>since</code>: pull API data starting from <code>since</code> trade id(tid)</strong></p>
-
-<ul>
-<li>Input integer</li>
-</ul>
-
-<p><strong><code>to_sql</code>: insert returned data into MySQL database</strong></p>
-
-<ul>
-<li>'no' (default) or 'yes'</li>
-</ul>
-
-<h2>
-<a id="quickstart-api-guide" class="anchor" href="#quickstart-api-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quickstart API Guide</h2>
-
-<pre><code>&gt;&gt; import bitquant as bq
-</code></pre>
-
-<h3>
-<a id="add-data-to-mysql-database" class="anchor" href="#add-data-to-mysql-database" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add Data to MySQL database</h3>
-
-<p>Insert DataFrame into MySQL table</p>
-
-<pre><code>&gt;&gt; bq.df_to_sql(df, table_name, typ='i'):
-</code></pre>
-
-<p>Ping exchange API for trade history data, insert data, and return DataFrame</p>
-
-<pre><code>&gt;&gt; ping = bq.request(exchange, symbol, limit='', since='')
-&gt;&gt; trade_history = ping.to_sql()
-</code></pre>
-
-<p>Convert trade history to OLHCV price history, insert data, and return DataFrame</p>
-
-<pre><code>&gt;&gt; top = bq.trades_to_price(exchange, symbol, freq, start=0, name='')
-&gt;&gt; price_history = top.to_sql()
-</code></pre>
-
-<p>Upload trade history csv from <a href="http://api.bitcoincharts.com/v1/csv/">BitcoinCharts</a> and return price history</p>
-
-<pre><code>&gt;&gt; price_history = bq.bchart_csv(exchange, symbol, freq, file_path, to_sql='no'):
-</code></pre>
-
-<h3>
-<a id="pull-data-from-mysqlquandl-as-pandas-dataframe" class="anchor" href="#pull-data-from-mysqlquandl-as-pandas-dataframe" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pull Data from MySQL/Quandl as pandas DataFrame</h3>
-
-<p>Pull trade history data from MySQL database</p>
-
-<pre><code>&gt;&gt; trade_history = bq.trades_df(exchange='', symbol='', start ='', end='')
-</code></pre>
-
-<p>Pull price history data from MySQL database</p>
-
-<pre><code>&gt;&gt; price_history = bq.price_df(exchange='', freq='', source='',start='')
-</code></pre>
-
-<p>Pull EOD price history from Quandl API</p>
-
-<pre><code>&gt;&gt; price_history = bq.quandl(exchange, symbol)
-</code></pre>
-
-<h3>
-<a id="maintain-mysql-servers-with-cron-class" class="anchor" href="#maintain-mysql-servers-with-cron-class" aria-hidden="true"><span class="octicon octicon-link"></span></a>Maintain MySQL servers with <code>cron</code> class</h3>
-
-<p>Create <code>cron</code> class</p>
-
-<pre><code>&gt;&gt; c = bq.cron()
-</code></pre>
-
-<p><code>cron</code> class runs through a list of various jobs</p>
-
-<ul>
-<li>
-<strong>trades job</strong>: Ping API for trade data and add to MySQL</li>
-<li>
-<strong>price job</strong>: Convert trade data to price data and add to MySQL</li>
-</ul>
-
-<p>Add <strong>trade jobs</strong> and <strong>price jobs</strong> to cron class (may add multiple jobs)</p>
-
-<pre><code>&gt;&gt; c.add_tjob(exchange, symbol, limit='')
-&gt;&gt; c.add_pjob(exchange, symbol, freq)
-</code></pre>
-
-<p>Run cron class, <code>time</code> should be the number of seconds for the cron job interval</p>
-
-<pre><code>&gt;&gt; c.run(time, mode='order', log='no')
-</code></pre>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">bitQuant maintained by <a href="https://github.com/rosspalmer">rosspalmer</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-    
+    </section>
 
+  
   </body>
 </html>
+
