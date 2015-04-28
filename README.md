@@ -40,7 +40,7 @@ bitQuant is a lightweight tool for extracting and organizing Bitcoin trade data 
 - WebSocket API support to live steam data
 - Support for OKCoin futures markets
 
-
+## [Documentation](https://github.com/rosspalmer/bitQuant/wiki)
 
 ## Installation and Setup Guide
 
