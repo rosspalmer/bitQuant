@@ -4,19 +4,6 @@ bitQuant is a lightweight tool for extracting and organizing Bitcoin trade data 
 
 ## Features
 
-### Supported Exchanges
-
-- bitfinex
-- bitstamp
-- coinbase
-- btce
-- okcoin
-- btcchina
-
-### Supported SQL Types
-- sqlite
-- MySQL
-
 ### API Class
 - Request trade data from exchange REST API
 - Return trade data as DataFrame
@@ -33,12 +20,27 @@ bitQuant is a lightweight tool for extracting and organizing Bitcoin trade data 
 - Embedded DataFrames store duplicate-free trade and price data
 - Use `run_loop` function to continuously perform trade data requests on multiple exchanges
 
+### Supported Exchanges
+
+- bitfinex
+- bitstamp
+- coinbase
+- btce
+- okcoin
+- btcchina
+
+### Supported SQL Types
+- sqlite
+- MySQL
+
 ## Planned Features
 - Expand API data requests to support ticker, orderbook, and lendbook data
 - Add data remediation feature to fill in trade history holes using `since` API parameter
 - Portfilo related API POST requests to perform trades, post orders, and access account information
 - WebSocket API support to live steam data
 - Support for OKCoin futures markets
+
+
 
 ## Installation and Setup Guide
 
