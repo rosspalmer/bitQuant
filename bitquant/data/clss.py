@@ -55,8 +55,14 @@ class data(object):
                 from_sql='no', start=''):
         if from_sql == 'yes':
             self.get_trades(exchange, symbol, start=start)
-        trd = self.trd[(self.trd.exchange==exchange) \
-                    & (self.trd.symbol==symbol)]
+            # get_trades already applied exchange, symbol checks
+            trd = self.trd
+        else:
+            trd = self.trd
+            if exchange <> '':
+                trd = self.trd[self.trd.exchange==exchange]
+            if symbol <> '':
+                trd = self.trd[self.trd.symbol==symbol]
         trd = tools.date_index(trd)
         if len(trd.index) > 0:
             prc = conv.olhcv(trd, freq, label=label)
