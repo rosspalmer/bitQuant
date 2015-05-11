@@ -2,11 +2,15 @@ import numpy as np
 from pandas.io.json import json_normalize
 from pandas import DataFrame, to_datetime
 
-def format_df(response, exchange, symbol, mode):
-    if mode == 'trades':
-        df = trades(response, exchange, symbol, mode)
-    if mode == 'quandl':
-        df = quandl(response)
+#|Create DataFrame from JSON response and standardize data
+def format_df(response, exchange, symbol):
+    if exchange == 'btce':
+        for col in response:
+            response = response[col]
+    df = json_normalize(response)
+    if exchange == 'coinbase':
+        df['time'] = to_datetime(df['time'], utc=0)
+        df['timestamp'] = df['time'].astype(np.int64) // 10**9
     df = standard_columns(df)
     if 'exchange' not in df:
         df['exchange'] = exchange
@@ -14,26 +18,7 @@ def format_df(response, exchange, symbol, mode):
         df['symbol'] = symbol
     return df
 
-def trades(response, exchange, symbol, mode):
-    if exchange == 'btce':
-        for col in response:
-            response = response[col]
-    df = json_normalize(response)
-    if symbol == 'coinbase':
-            df['time'] = to_datetime(df['time'], utc=0)
-            df['timestamp'] = df['time'].astype(np.int64) // 10**9
-    return df
-
-def quandl(response):
-    data = response['data']
-    headers = response['column_names']
-    df = DataFrame(data, columns=headers)
-    df['timestamp'] = df['Date'].apply(tools.dateconv)
-    df['freq'] = 'd'
-    df['source'] = 'quandl'
-    df = tools.date_index(df.drop('Date', axis=1))
-    return df
-
+#|Standardize column names and drop columns not in dictionary below
 def standard_columns(df):
     cols = []
     headers = {'tid':'tid','trade_id':'tid',

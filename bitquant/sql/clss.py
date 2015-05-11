@@ -24,7 +24,6 @@ class sql(object):
     def insert(self, table_name, df):
         if len(df.index) > 0:
             data = df.to_dict('records')
-            #print data
             statement = stmt.insert(self.tbl[table_name], self.sql_type)
             statement.execute(data)
 

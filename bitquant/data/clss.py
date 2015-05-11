@@ -32,7 +32,7 @@ class data(object):
         self.trd = self.trd.append(self.a.run(exchange,symbol))
         self.trd = self.trd.drop_duplicates(['tid','exchange'])
 
-    def run_loop(self, time, to_sql=60):
+    def run_loop(self, time, to_sql=60, log='no'):
         dump = tm.time() + to_sql
         end = tm.time() + time
         while tm.time() < end:
@@ -40,7 +40,7 @@ class data(object):
                 self.run_trades(job['exchange'], job['symbol'])
             if tm.time() > dump:
                 dump = tm.time() + to_sql
-                self.to_sql()
+                self.to_sql(log)
 
     def get_price(self, exchange='', symbol='',
                     freq='', start=''):
@@ -70,7 +70,7 @@ class data(object):
             self.prc = self.prc.drop_duplicates(['timestamp','exchange',
                                         'symbol','freq'])
 
-    def to_sql(self):
+    def to_sql(self, log='no'):
         if 'sent' in self.trd:
             trd = self.trd[self.trd['sent']<>'yes']
         else:
@@ -81,6 +81,8 @@ class data(object):
             prc = self.prc
         self.s.insert('trades', trd)
         self.s.insert('price', prc)
-        print trd
+        if log == 'yes':
+            print trd
+            print prc
         self.trd['sent'] = 'yes'
         self.prc['sent'] = 'yes'
