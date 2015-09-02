@@ -34,11 +34,16 @@ bitQuant is a lightweight tool for extracting and organizing Bitcoin trade data 
 - MySQL
 
 ## Planned Features
+- Customizeable Kivy-based GUI with features below
+    - Multi Exchange ticker
+    - Live trade history compiling multiple exchanges
+    - Live order book
 - Expand API data requests to support ticker, orderbook, and lendbook data
 - Add data remediation feature to fill in trade history holes using `since` API parameter
 - Portfilo related API POST requests to perform trades, post orders, and access account information
 - WebSocket API support to live steam data
 - Support for OKCoin futures markets
+- Support for additional SQL flavors
 
 ## [Documentation](https://github.com/rosspalmer/bitQuant/wiki)
 
