@@ -18,7 +18,7 @@ class data(object):
     def add_trades(self, exchange, symbol, limit='', since='',
                     auto_since='no', ping_limit=1.0):
         job = {'exchange':exchange,'symbol':symbol}
-        self.a.add_job(exchange, symbol, limit=limit, since=since,
+        self.a.add_job(exchange, symbol, 'trades', limit=limit, since=since,
                     auto_since=auto_since, ping_limit=ping_limit)
         self.jobs.append(job)
 
@@ -29,7 +29,7 @@ class data(object):
         self.trd = self.trd.drop_duplicates(['tid','exchange'])
 
     def run_trades(self, exchange, symbol):
-        self.trd = self.trd.append(self.a.run(exchange,symbol))
+        self.trd = self.trd.append(self.a.run(exchange,symbol,'trades'))
         self.trd = self.trd.drop_duplicates(['tid','exchange'])
 
     def run_loop(self, time, to_sql=60, log='no'):
