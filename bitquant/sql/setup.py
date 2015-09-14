@@ -1,5 +1,7 @@
 import clss
 
+import os
+
 def setup_sql():
     menu()
     s = clss.sql()
@@ -18,7 +20,7 @@ def menu():
     print
     print
     if typ == 1:
-        file_path = str(raw_input('Database Name: ')) + '\n'
+        file_path = str(raw_input('Location/Database Name: ')) + '\n'
         txt.write(str(typ) + '\n')
         txt.write(file_path)
     if typ == 2:

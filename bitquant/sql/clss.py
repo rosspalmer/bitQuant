@@ -1,5 +1,5 @@
 import stmt
-from ..data.tools import date_index
+from ..data.tools import dateconv
 
 from pandas import DataFrame
 from sqlite3 import dbapi2 as sqlite
@@ -30,9 +30,6 @@ class sql(object):
     def select(self, table_name, exchange='',  symbol='',
                 start='', end='', source='', freq=''):
         tbl = self.tbl[table_name]
-        #tbl = dic[table_name]
-        #statement = stmt.select(tbl, exchange='',
-            #symbol='', start='', end='', source='', freq='')
         sel = select([tbl])
         if exchange <> '':
             sel = sel.where(tbl.c.exchange == exchange)
@@ -40,11 +37,11 @@ class sql(object):
             sel = sel.where(tbl.c.symbol == symbol)
         if start <> '':
             if isinstance(start, str):
-                start = tools.dateconv(start)
+                start = dateconv(start)
             sel = sel.where(tbl.c.timestamp >= start)
         if end <> '':
             if isinstance(end, str):
-                end = tools.dateconv(end)
+                end = dateconv(end)
             sel = sel.where(tbl.c.timestamp <= end)
         if freq <> '':
             sel = sel.where(tbl.c.freq == freq)
